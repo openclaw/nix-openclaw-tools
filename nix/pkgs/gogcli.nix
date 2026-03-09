@@ -3,22 +3,22 @@
 let
   sources = {
     "aarch64-darwin" = {
-      url = "https://github.com/steipete/gogcli/releases/download/v0.11.0/gogcli_0.11.0_darwin_arm64.tar.gz";
-      hash = "sha256-ESaGjD+TmhSqlld9Vlj1/vHhU58zJzC/NaBudBYsnmE=";
+      url = "https://github.com/steipete/gogcli/releases/download/v0.12.0/gogcli_0.12.0_darwin_arm64.tar.gz";
+      hash = "sha256-03FmSb9taj8F6UvocEmRxp3Ghqz8hNNfHyiBL9JPEVE=";
     };
     "x86_64-linux" = {
-      url = "https://github.com/steipete/gogcli/releases/download/v0.11.0/gogcli_0.11.0_linux_amd64.tar.gz";
-      hash = "sha256-ypi6VuKczTcT/nv4Nf3KAK4bl83LewvF45Pn7bQInIQ=";
+      url = "https://github.com/steipete/gogcli/releases/download/v0.12.0/gogcli_0.12.0_linux_amd64.tar.gz";
+      hash = "sha256-oD/MvWfqLlmialbpLeiRhXf0vr5LL5RoI0GXd4J82rI=";
     };
     "aarch64-linux" = {
-      url = "https://github.com/steipete/gogcli/releases/download/v0.11.0/gogcli_0.11.0_linux_arm64.tar.gz";
-      hash = "sha256-G/6YBUVkFQFIj+2Txm/HZnHHKkYFKF9XRXLaxwDv3TU=";
+      url = "https://github.com/steipete/gogcli/releases/download/v0.12.0/gogcli_0.12.0_linux_arm64.tar.gz";
+      hash = "sha256-1/IElNfrDocWYxhT0FXMuzaMe4HLgWX1W0WIS8y2e0s=";
     };
   };
 in
 stdenv.mkDerivation {
   pname = "gogcli";
-  version = "0.11.0";
+  version = "0.12.0";
 
   src = fetchurl sources.${stdenv.hostPlatform.system};
 
