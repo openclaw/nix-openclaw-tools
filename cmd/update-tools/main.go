@@ -148,6 +148,16 @@ func main() {
 
 	tools := []Tool{
 		{
+			Name: "discrawl",
+			Repo: "steipete/discrawl",
+			Assets: []AssetSpec{
+				{System: "aarch64-darwin", Regex: regexp.MustCompile(`discrawl_[0-9.]+_darwin_arm64\.tar\.gz`)},
+				{System: "x86_64-linux", Regex: regexp.MustCompile(`discrawl_[0-9.]+_linux_amd64\.tar\.gz`)},
+				{System: "aarch64-linux", Regex: regexp.MustCompile(`discrawl_[0-9.]+_linux_arm64\.tar\.gz`)},
+			},
+			NixFile: filepath.Join(repoRoot, "nix", "pkgs", "discrawl.nix"),
+		},
+		{
 			Name: "gogcli",
 			Repo: "steipete/gogcli",
 			Assets: []AssetSpec{
