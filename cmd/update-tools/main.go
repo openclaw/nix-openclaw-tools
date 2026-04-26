@@ -189,15 +189,6 @@ func main() {
 			NixFile: filepath.Join(repoRoot, "nix", "pkgs", "sonoscli.nix"),
 		},
 		{
-			Name:     "bird",
-			Repo:     "steipete/bird",
-			Optional: true, // repo got nuked; keep packaging pinned, but don't fail the updater
-			Assets: []AssetSpec{
-				{System: "aarch64-darwin", Regex: regexp.MustCompile(`bird-macos-universal-v[0-9.]+\.tar\.gz`)},
-			},
-			NixFile: filepath.Join(repoRoot, "nix", "pkgs", "bird.nix"),
-		},
-		{
 			Name: "peekaboo",
 			Repo: "steipete/peekaboo",
 			Assets: []AssetSpec{

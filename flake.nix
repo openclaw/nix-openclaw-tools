@@ -16,7 +16,6 @@
         goplaces = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
         camsnap = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
         sonoscli = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
-        bird = [ "aarch64-darwin" ];
         peekaboo = [ "aarch64-darwin" ];
         poltergeist = [ "aarch64-darwin" ];
         sag = [ "aarch64-darwin" "x86_64-linux" ];
@@ -46,9 +45,6 @@
           })
           // (lib.optionalAttrs (supports "sonoscli") {
             sonoscli = pkgs.callPackage ./nix/pkgs/sonoscli.nix {};
-          })
-          // (lib.optionalAttrs (supports "bird") {
-            bird = pkgs.callPackage ./nix/pkgs/bird.nix {};
           })
           // (lib.optionalAttrs (supports "peekaboo") {
             peekaboo = pkgs.callPackage ./nix/pkgs/peekaboo.nix {};

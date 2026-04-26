@@ -25,7 +25,6 @@ These tools are essential for a capable openclaw instance - screen capture, came
 | [**goplaces**](https://github.com/steipete/goplaces) | Google Places API (New) CLI |
 | [**camsnap**](https://github.com/steipete/camsnap) | Capture snapshots/clips from RTSP/ONVIF cameras |
 | [**sonoscli**](https://github.com/steipete/sonoscli) | Control Sonos speakers |
-| [**bird**](https://github.com/steipete/bird) | Fast X CLI for tweeting, replying, and reading |
 | [**peekaboo**](https://github.com/steipete/peekaboo) | Lightning-fast macOS screenshots & AI vision analysis |
 | [**poltergeist**](https://github.com/steipete/poltergeist) | Universal file watcher with auto-rebuild |
 | [**sag**](https://github.com/steipete/sag) | Command-line ElevenLabs TTS with mac-style flags |
@@ -95,6 +94,12 @@ Fetches latest release versions/URLs/hashes and updates the Nix expressions.
 | **Garnix** | On push | Builds all packages via `checks.*` (darwin + linux) |
 
 Automated PRs keep everything fresh without manual intervention.
+
+## Temporarily disabled
+
+`bird` is not exported right now because the upstream GitHub release assets for
+v0.8.0 are gone. The npm package still exists, but this flake does not currently
+build npm dependencies for it.
 
 ## License
 

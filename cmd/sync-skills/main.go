@@ -63,7 +63,6 @@ func main() {
 		{"gogcli", "skills/gog"},
 		{"camsnap", "skills/camsnap"},
 		{"sonoscli", "skills/sonoscli"},
-		{"bird", "skills/bird"},
 		{"peekaboo", "skills/peekaboo"},
 		{"sag", "skills/sag"},
 		{"imsg", "skills/imsg"},
