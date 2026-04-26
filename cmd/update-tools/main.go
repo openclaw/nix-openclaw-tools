@@ -158,6 +158,16 @@ func main() {
 			NixFile: filepath.Join(repoRoot, "nix", "pkgs", "discrawl.nix"),
 		},
 		{
+			Name: "wacrawl",
+			Repo: "steipete/wacrawl",
+			Assets: []AssetSpec{
+				{System: "aarch64-darwin", Regex: regexp.MustCompile(`wacrawl_[0-9.]+_darwin_arm64\.tar\.gz`)},
+				{System: "x86_64-linux", Regex: regexp.MustCompile(`wacrawl_[0-9.]+_linux_amd64\.tar\.gz`)},
+				{System: "aarch64-linux", Regex: regexp.MustCompile(`wacrawl_[0-9.]+_linux_arm64\.tar\.gz`)},
+			},
+			NixFile: filepath.Join(repoRoot, "nix", "pkgs", "wacrawl.nix"),
+		},
+		{
 			Name: "gogcli",
 			Repo: "steipete/gogcli",
 			Assets: []AssetSpec{

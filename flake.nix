@@ -13,6 +13,7 @@
       packageSystems = {
         summarize = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
         discrawl = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
+        wacrawl = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
         gogcli = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
         goplaces = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
         camsnap = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
@@ -38,6 +39,9 @@
           })
           // (lib.optionalAttrs (supports "discrawl") {
             discrawl = pkgs.callPackage ./nix/pkgs/discrawl.nix {};
+          })
+          // (lib.optionalAttrs (supports "wacrawl") {
+            wacrawl = pkgs.callPackage ./nix/pkgs/wacrawl.nix {};
           })
           // (lib.optionalAttrs (supports "gogcli") {
             gogcli = pkgs.callPackage ./nix/pkgs/gogcli.nix {};
