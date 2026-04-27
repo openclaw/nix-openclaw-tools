@@ -16,6 +16,19 @@ These tools are essential for a capable openclaw instance - screen capture, came
 - **Fresh**: CI keeps tools and skills at latest automatically
 - **Integrated**: Skills teach your bot how to use each tool
 
+## Pure Nix and Home Manager design
+
+This repo is meant to be consumable directly from Nix flakes, Darwin, and Home
+Manager configs. Packages should stay pinned and reproducible, and optional
+Home Manager modules should expose normal `programs.<name>` options instead of
+requiring downstream users to hand-write app bundle or launchd glue.
+
+For macOS app bundles, prefer a Nix package plus Home Manager integration. Home
+Manager can expose app bundles from `home.packages` through its Darwin app
+targets, and modules can opt into `launchd.agents` when Home Manager should own
+startup. Homebrew casks are still useful, but they belong in a nix-darwin
+Homebrew configuration, not in these pure Nix package/module definitions.
+
 ## What's included
 
 | Tool | What it does |
@@ -31,6 +44,7 @@ These tools are essential for a capable openclaw instance - screen capture, came
 | [**poltergeist**](https://github.com/steipete/poltergeist) | Universal file watcher with auto-rebuild |
 | [**sag**](https://github.com/steipete/sag) | Command-line ElevenLabs TTS with mac-style flags |
 | [**imsg**](https://github.com/steipete/imsg) | iMessage/SMS CLI |
+| [**CodexBar**](https://github.com/steipete/CodexBar) | macOS menu bar app for Codex, Claude, and other provider usage |
 
 ## Usage (as openclaw plugins)
 
@@ -63,6 +77,7 @@ inputs.nix-steipete-tools.packages.aarch64-darwin.camsnap
 inputs.nix-steipete-tools.packages.aarch64-darwin.discrawl
 inputs.nix-steipete-tools.packages.aarch64-darwin.peekaboo
 inputs.nix-steipete-tools.packages.aarch64-darwin.wacrawl
+inputs.nix-steipete-tools.packages.aarch64-darwin.codexbar-app
 # etc.
 
 # Linux examples:
@@ -71,6 +86,41 @@ inputs.nix-steipete-tools.packages.x86_64-linux.discrawl
 inputs.nix-steipete-tools.packages.aarch64-linux.gogcli
 inputs.nix-steipete-tools.packages.x86_64-linux.summarize
 inputs.nix-steipete-tools.packages.x86_64-linux.wacrawl
+```
+
+### Home Manager modules
+
+Some packages also ship Home Manager modules so they can be enabled directly
+without hand-writing install and launchd wiring. For CodexBar:
+
+```nix
+{
+  imports = [ inputs.nix-steipete-tools.homeManagerModules.codexbar ];
+
+  programs.codexbar.enable = true;
+}
+```
+
+That adds the CodexBar app package to `home.packages`. Home Manager can then
+expose the app bundle through its Darwin app targets. If you want Home Manager
+to own startup too, enable the launchd agent explicitly:
+
+```nix
+{
+  programs.codexbar = {
+    enable = true;
+    launchd.enable = true;
+    launchd.keepAlive = false;
+  };
+}
+```
+
+### macOS app bundles
+
+If you only want the raw app package, use the package output directly:
+
+```nix
+inputs.nix-steipete-tools.packages.aarch64-darwin.codexbar-app
 ```
 
 ## Skills syncing

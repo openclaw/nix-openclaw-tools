@@ -22,6 +22,7 @@
         poltergeist = [ "aarch64-darwin" ];
         sag = [ "aarch64-darwin" "x86_64-linux" ];
         imsg = [ "aarch64-darwin" ];
+        codexbar-app = [ "aarch64-darwin" ];
       };
     in {
       packages = forAllSystems (system:
@@ -66,7 +67,15 @@
           // (lib.optionalAttrs (supports "imsg") {
             imsg = pkgs.callPackage ./nix/pkgs/imsg.nix {};
           })
+          // (lib.optionalAttrs (supports "codexbar-app") {
+            codexbar-app = pkgs.callPackage ./nix/pkgs/codexbar-app.nix {};
+          })
       );
+
+      homeManagerModules = {
+        codexbar = import ./nix/modules/home-manager/codexbar.nix { inherit self; };
+        default = self.homeManagerModules.codexbar;
+      };
 
       checks = forAllSystems (system: self.packages.${system});
     };
