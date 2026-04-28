@@ -45,6 +45,8 @@ Homebrew configuration, not in these pure Nix package/module definitions.
 | [**sag**](https://github.com/steipete/sag) | Command-line ElevenLabs TTS with mac-style flags |
 | [**imsg**](https://github.com/steipete/imsg) | iMessage/SMS CLI |
 | [**CodexBar**](https://github.com/steipete/CodexBar) | macOS menu bar app for Codex, Claude, and other provider usage |
+| [**RepoBar**](https://github.com/steipete/RepoBar) | macOS menu bar app for GitHub CI, PRs, and releases |
+| [**Trimmy**](https://github.com/steipete/Trimmy) | macOS menu bar app for flattening multi-line shell snippets |
 
 ## Usage (as openclaw plugins)
 
@@ -78,6 +80,8 @@ inputs.nix-steipete-tools.packages.aarch64-darwin.discrawl
 inputs.nix-steipete-tools.packages.aarch64-darwin.peekaboo
 inputs.nix-steipete-tools.packages.aarch64-darwin.wacrawl
 inputs.nix-steipete-tools.packages.aarch64-darwin.codexbar-app
+inputs.nix-steipete-tools.packages.aarch64-darwin.repobar-app
+inputs.nix-steipete-tools.packages.aarch64-darwin.trimmy-app
 # etc.
 
 # Linux examples:
@@ -91,23 +95,42 @@ inputs.nix-steipete-tools.packages.x86_64-linux.wacrawl
 ### Home Manager modules
 
 Some packages also ship Home Manager modules so they can be enabled directly
-without hand-writing install and launchd wiring. For CodexBar:
+without hand-writing install and launchd wiring. For CodexBar, RepoBar, and
+Trimmy:
 
 ```nix
 {
-  imports = [ inputs.nix-steipete-tools.homeManagerModules.codexbar ];
+  imports = [
+    inputs.nix-steipete-tools.homeManagerModules.codexbar
+    inputs.nix-steipete-tools.homeManagerModules.repobar
+    inputs.nix-steipete-tools.homeManagerModules.trimmy
+  ];
 
   programs.codexbar.enable = true;
+  programs.repobar.enable = true;
+  programs.trimmy.enable = true;
 }
 ```
 
-That adds the CodexBar app package to `home.packages`. Home Manager can then
-expose the app bundle through its Darwin app targets. If you want Home Manager
-to own startup too, enable the launchd agent explicitly:
+That adds the app packages to `home.packages`. Home Manager can then expose the
+app bundles through its Darwin app targets. If you want Home Manager to own
+startup too, enable each launchd agent explicitly:
 
 ```nix
 {
   programs.codexbar = {
+    enable = true;
+    launchd.enable = true;
+    launchd.keepAlive = false;
+  };
+
+  programs.repobar = {
+    enable = true;
+    launchd.enable = true;
+    launchd.keepAlive = false;
+  };
+
+  programs.trimmy = {
     enable = true;
     launchd.enable = true;
     launchd.keepAlive = false;
@@ -121,6 +144,8 @@ If you only want the raw app package, use the package output directly:
 
 ```nix
 inputs.nix-steipete-tools.packages.aarch64-darwin.codexbar-app
+inputs.nix-steipete-tools.packages.aarch64-darwin.repobar-app
+inputs.nix-steipete-tools.packages.aarch64-darwin.trimmy-app
 ```
 
 ## Skills syncing
