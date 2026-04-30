@@ -212,7 +212,7 @@ func main() {
 			Name: "peekaboo",
 			Repo: "steipete/peekaboo",
 			Assets: []AssetSpec{
-				{System: "aarch64-darwin", Regex: regexp.MustCompile(`peekaboo-macos-universal\.tar\.gz`)},
+				{System: "aarch64-darwin", Regex: regexp.MustCompile(`peekaboo-macos-(?:universal|arm64)\.tar\.gz`)},
 			},
 			NixFile: filepath.Join(repoRoot, "nix", "pkgs", "peekaboo.nix"),
 		},
