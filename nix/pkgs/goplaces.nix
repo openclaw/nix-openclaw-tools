@@ -3,20 +3,20 @@
 let
   sources = {
     "aarch64-darwin" = {
-      url = "https://github.com/steipete/goplaces/releases/download/v0.3.0/goplaces_0.3.0_darwin_arm64.tar.gz";
-      hash = "sha256-FAhLzN7CbMghXNTLPOyaRHJjMuUt+LlDoWRV0zQSpmU=";
+      url = "https://github.com/steipete/goplaces/releases/download/v0.4.0/goplaces_0.4.0_darwin_arm64.tar.gz";
+      hash = "sha256-FJ8hVqQhp/Ppk17CrDJk4dmu2pvS2xBX5cAzafpaM8g=";
     };
     "x86_64-darwin" = {
-      url = "https://github.com/steipete/goplaces/releases/download/v0.3.0/goplaces_0.3.0_darwin_amd64.tar.gz";
-      hash = "sha256-Rue66IenX9MX69nAwDGDMSN5+2LzzeZ8nE7N2eCvR1E=";
+      url = "https://github.com/steipete/goplaces/releases/download/v0.4.0/goplaces_0.4.0_darwin_amd64.tar.gz";
+      hash = "sha256-/vVK0hqh1q3tliSy4mRT9X3jRayYhWAfZLS+VsFd+NU=";
     };
     "x86_64-linux" = {
-      url = "https://github.com/steipete/goplaces/releases/download/v0.3.0/goplaces_0.3.0_linux_amd64.tar.gz";
-      hash = "sha256-z6eNTZo2K7wsPT/3d3Fg+1pZlN5+hSGwBIG3LUBTsec=";
+      url = "https://github.com/steipete/goplaces/releases/download/v0.4.0/goplaces_0.4.0_linux_amd64.tar.gz";
+      hash = "sha256-cUHDAZ4Ep50K2ljLn8LyJeWPJlcr/sytP95UsNmSv3w=";
     };
     "aarch64-linux" = {
-      url = "https://github.com/steipete/goplaces/releases/download/v0.3.0/goplaces_0.3.0_linux_arm64.tar.gz";
-      hash = "sha256-IhwA/xN7SqdoNd7WB+RtOKHsmGyo+62IZDBEDWfevRs=";
+      url = "https://github.com/steipete/goplaces/releases/download/v0.4.0/goplaces_0.4.0_linux_arm64.tar.gz";
+      hash = "sha256-YjeLRDLwuQbUOYZYnpNkuYDvsm54PB1jmqTHas2T5VY=";
     };
   };
 
@@ -31,7 +31,7 @@ let
 in
 stdenv.mkDerivation {
   pname = "goplaces";
-  version = "0.3.0";
+  version = "0.4.0";
 
   src = fetchurl sources.${stdenv.hostPlatform.system};
 
