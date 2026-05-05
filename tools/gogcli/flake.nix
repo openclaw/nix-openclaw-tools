@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs?rev=16c7794d0a28b5a37904d55bcca36003b9109aaa&narHash=sha256-fFUnEYMla8b7UKjijLnMe%2BoVFOz6HjijGGNS1l7dYaQ%3D";
-    root.url = "github:openclaw/nix-openclaw-tools?rev=eddb00d4c1037a983913fccf32880aece050cd32&narHash=sha256-Lzs6tzCkOOtDaZIRSGvS6ykJOtu0hZrdI95kxhkSIuw=";
+    root.url = "../..";
   };
 
   outputs = { self, nixpkgs, root }:

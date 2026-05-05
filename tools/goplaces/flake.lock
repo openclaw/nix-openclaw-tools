@@ -44,20 +44,14 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1770237944,
-        "narHash": "sha256-nfCSSyNU97XpKVPgo6mODBwrVeTOuMCl3i18QuGjpN0=",
-        "owner": "openclaw",
-        "repo": "nix-openclaw-tools",
-        "rev": "6352c8247b3b889d7f17bce1f09d6c58fd34932c",
-        "type": "github"
+        "path": "../..",
+        "type": "path"
       },
       "original": {
-        "narHash": "sha256-nfCSSyNU97XpKVPgo6mODBwrVeTOuMCl3i18QuGjpN0=",
-        "owner": "openclaw",
-        "repo": "nix-openclaw-tools",
-        "rev": "6352c8247b3b889d7f17bce1f09d6c58fd34932c",
-        "type": "github"
-      }
+        "path": "../..",
+        "type": "path"
+      },
+      "parent": []
     }
   },
   "root": "root",
