@@ -3,14 +3,14 @@
 let
   sources = {
     "aarch64-darwin" = {
-      url = "https://github.com/steipete/imsg/releases/download/v0.5.0/imsg-macos.zip";
-      hash = "sha256-rirJZ+8eQf0Ea3RXD4bHrWljSpGEb+wtbMdrsEtHPAo=";
+      url = "https://github.com/steipete/imsg/releases/download/v0.6.0/imsg-macos.zip";
+      hash = "sha256-oA/Q1ZlLNtMxAwGrf5TbgsrfWxdJPE043nBW0cDCCw8=";
     };
   };
 in
 stdenv.mkDerivation {
   pname = "imsg";
-  version = "0.5.0";
+  version = "0.6.0";
 
   src = fetchurl sources.${stdenv.hostPlatform.system};
 
