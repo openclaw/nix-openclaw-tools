@@ -15,13 +15,13 @@
 
 let
   pname = "qmd";
-  version = "2.5.2";
+  version = "2.5.3";
 
   src = fetchFromGitHub {
     owner = "tobi";
     repo = "qmd";
     rev = "v${version}";
-    hash = "sha256-CCTPYEdbpLyFFAXyagQIWabZXPstLcWnJ7MT0+XF9uk=";
+    hash = "sha256-bFk078qQ8Ha/1na+r5ka6yNPI/Pealh0Rk6hJxKBwNs=";
   };
 
   nodeModulesHashes = {
