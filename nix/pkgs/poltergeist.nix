@@ -4,7 +4,7 @@ let
   sources = {
     "aarch64-darwin" = {
       url = "https://github.com/steipete/poltergeist/releases/download/v2.1.2/poltergeist-macos-universal-v2.1.2.tar.gz";
-      hash = "sha256-mB4zkL77nBTJ2RlhU2kYixlbGH0rA6A1cRAaMO+/4Wk=";
+      hash = "sha256-t+9+CvKWYEnEK2BDyHDrHstzmApkuGgFJ+ZeZ7Txzok=";
     };
   };
 in
