@@ -64,6 +64,10 @@ if stdenv.isLinux then
       zstd
     ];
 
+    # auditTmpdir classifies every vendored JS file before checking native
+    # artifacts. Keep normal fixups, but skip that scan before Garnix times out.
+    noAuditTmpdir = true;
+
     env = {
       PNPM_IGNORE_PACKAGE_MANAGER_CHECK = "1";
       CI = "1";
