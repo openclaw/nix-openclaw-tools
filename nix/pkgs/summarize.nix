@@ -64,11 +64,9 @@ if stdenv.isLinux then
       zstd
     ];
 
-    # These ELF-oriented hooks shell-classify every vendored JS/source-map
-    # file in libexec. The Node package does not need their binary mutations.
-    dontPatchELF = true;
-    dontStrip = true;
-    noAuditTmpdir = true;
+    # makeWrapper completes the runtime package during install. Generic fixup
+    # would shell-classify the entire vendored JS workspace for each hook.
+    dontFixup = true;
 
     env = {
       PNPM_IGNORE_PACKAGE_MANAGER_CHECK = "1";
