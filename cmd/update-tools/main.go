@@ -90,7 +90,7 @@ func fetchText(url string) (string, error) {
 	if token := os.Getenv("GH_TOKEN"); token != "" {
 		req.Header.Set("Authorization", "Bearer "+token)
 	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := internal.HTTPClient.Do(req)
 	if err != nil {
 		return "", err
 	}
