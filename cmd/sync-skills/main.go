@@ -2,13 +2,17 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 )
+
+var runTimeout = 5 * time.Minute
 
 type Mapping struct {
 	Tool string
@@ -16,12 +20,17 @@ type Mapping struct {
 }
 
 func run(dir string, name string, args ...string) error {
-	cmd := exec.Command(name, args...)
+	ctx, cancel := context.WithTimeout(context.Background(), runTimeout)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, name, args...)
 	cmd.Dir = dir
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 	if err := cmd.Run(); err != nil {
+		if ctx.Err() != nil {
+			return fmt.Errorf("%s %v: %w", name, args, ctx.Err())
+		}
 		return fmt.Errorf("%s %v: %v: %s", name, args, err, out.String())
 	}
 	return nil
