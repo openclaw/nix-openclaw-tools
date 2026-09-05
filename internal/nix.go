@@ -2,12 +2,19 @@ package internal
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"os/exec"
 	"regexp"
 	"strings"
+	"time"
 )
+
+// Linux source builds of summarize can exceed 10m.
+var summarizeTimeout = 45 * time.Minute
+
+var summarizeNix = "nix"
 
 type PrefetchResult struct {
 	Hash string `json:"hash"`
@@ -66,15 +73,21 @@ func NixBuildSummarize() (string, error) {
 }
 
 func NixBuildSummarizeSystem(system string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), summarizeTimeout)
+	defer cancel()
 	args := []string{"build", ".#summarize"}
 	if system != "" {
 		args = append(args, "--system", system)
 	}
-	cmd := exec.Command("nix", args...)
+	cmd := exec.CommandContext(ctx, summarizeNix, args...)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
+	isolateProcessGroup(cmd)
 	err := cmd.Run()
+	if err != nil && ctx.Err() != nil {
+		return out.String(), fmt.Errorf("nix build summarize: %w", ctx.Err())
+	}
 	return out.String(), err
 }
 
