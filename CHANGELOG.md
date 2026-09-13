@@ -4,6 +4,7 @@
 
 **Highlights:** Restore automatic tool updates and refresh the packaged releases.
 
+- Make camsnap find its packaged ffmpeg when launched directly or through an OpenClaw plugin, without relying on the caller's PATH.
 - Refresh nixpkgs, share its pin across all twelve plugins, and use pinned Go toolchains with serialized maintenance workflows and minimum-version CI coverage.
 - Keep package expressions intact when an update fails, reject missing or duplicate source fields, and publish successful tool updates even if another upstream fails.
 - Restore summarize updates with pnpm 11 lockfiles using the maintained reproducible dependency fetcher and Node 24, and show Nix diagnostics when hash discovery fails.

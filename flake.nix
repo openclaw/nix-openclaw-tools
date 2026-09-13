@@ -45,6 +45,11 @@
           packages = self.packages.${system};
         in
           packages
+          // {
+            camsnap-runtime = pkgs.callPackage ./nix/checks/camsnap-runtime.nix {
+              camsnap = packages.camsnap;
+            };
+          }
           // (lib.optionalAttrs (packages ? qmd) {
             qmd-smoke = pkgs.callPackage ./nix/checks/qmd-smoke.nix {
               qmd = packages.qmd;

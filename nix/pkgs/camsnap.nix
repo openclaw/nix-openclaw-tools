@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchurl, ffmpeg }:
+{ lib, stdenv, fetchurl, ffmpeg, makeWrapper }:
 
 let
   sources = {
@@ -22,6 +22,7 @@ stdenv.mkDerivation {
 
   src = fetchurl sources.${stdenv.hostPlatform.system};
 
+  nativeBuildInputs = [ makeWrapper ];
   dontConfigure = true;
   dontBuild = true;
 
@@ -34,6 +35,7 @@ stdenv.mkDerivation {
     mkdir -p "$out/bin" "$out/share/doc/camsnap"
     cp $(find . -type f -name camsnap | head -1) "$out/bin/camsnap"
     chmod 0755 "$out/bin/camsnap"
+    wrapProgram "$out/bin/camsnap" --prefix PATH : "${lib.makeBinPath [ ffmpeg ]}"
     if [ -f LICENSE ]; then
       cp LICENSE "$out/share/doc/camsnap/"
     fi
@@ -42,8 +44,6 @@ stdenv.mkDerivation {
     fi
     runHook postInstall
   '';
-
-  propagatedBuildInputs = [ ffmpeg ];
 
   meta = with lib; {
     description = "One command to grab frames, clips, or motion alerts from RTSP/ONVIF cams";

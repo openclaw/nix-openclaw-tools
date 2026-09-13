@@ -69,6 +69,9 @@ Each plugin bundles:
 
 If you just want the binaries without the plugin wrapper:
 
+The camsnap executable includes its ffmpeg runtime on PATH, including when you
+invoke it directly from the Nix store.
+
 ```nix
 inputs.nix-openclaw-tools.url = "github:openclaw/nix-openclaw-tools";
 
