@@ -30,11 +30,13 @@ jobs:
         uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
 
       - name: Update tool versions and hashes
+        id: update
         env:
           GH_TOKEN: ${{ github.token }}
         run: go run ./cmd/update-tools
 
       - name: Commit & push if changed
+        if: ${{ !cancelled() && (success() || steps.update.outcome == 'failure') }}
         run: |
           if git diff --quiet; then
             echo "No changes"

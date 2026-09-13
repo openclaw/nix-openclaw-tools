@@ -107,6 +107,11 @@ go run ./cmd/update-tools
 
 Fetches latest release versions/URLs/hashes and updates the Nix expressions.
 
+Each package update is committed only after all of its source fields and hashes
+are ready. A failed update leaves that package unchanged; other tools still get
+checked. Automation publishes the successful updates while keeping the run red
+for any failures. Interrupting the command stops further updates.
+
 GitHub requests time out after 30 seconds waiting for response headers. Once a
 response starts, slow bodies can finish without a whole-request deadline.
 
