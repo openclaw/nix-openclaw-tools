@@ -8,8 +8,16 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   go:
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ["1.22.12", "1.27.1"]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -17,6 +25,12 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Install Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ matrix.go }}
+          cache: false # This module has no external dependencies or go.sum.
 
       - name: Check formatting
         run: test -z "$(gofmt -l cmd internal)"
@@ -49,8 +63,8 @@ jobs:
       - name: Evaluate supported systems
         run: |
           nix flake check --no-build --all-systems
-          for plugin in gogcli goplaces summarize; do
-            nix flake metadata --no-update-lock-file --no-write-lock-file "./tools/$plugin" >/dev/null
+          for plugin in tools/*; do
+            nix flake metadata --no-update-lock-file --no-write-lock-file "./$plugin" >/dev/null
           done
 
       - name: Build package checks

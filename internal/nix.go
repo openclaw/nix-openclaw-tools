@@ -35,7 +35,7 @@ func PrefetchHash(url string) (string, error) {
 
 func PrefetchGitHub(owner, repo, rev string) (string, error) {
 	var out bytes.Buffer
-	if err := RunCommand("", PrefetchTimeout, &out, &out, "nix", "run", "nixpkgs#nix-prefetch-github", "--", "--json", "--quiet", owner, repo, "--rev", rev); err != nil {
+	if err := RunCommand("", PrefetchTimeout, &out, &out, "nix", "run", "--inputs-from", ".", "nixpkgs#nix-prefetch-github", "--", "--json", "--quiet", owner, repo, "--rev", rev); err != nil {
 		return "", fmt.Errorf("prefetch github failed: %w: %s", err, out.String())
 	}
 	raw := out.String()

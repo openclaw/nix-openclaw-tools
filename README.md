@@ -123,7 +123,13 @@ check pull embedding/reranking models; model prewarming belongs in nix-openclaw.
 | **update-tools** | Every 10 min | Checks for new tool releases |
 | **Garnix** | On push | Builds all packages via `checks.*` (darwin + linux) |
 
-Automation commits directly when versions or skills change.
+Automation commits directly when versions or skills change. The two maintenance
+workflows share a concurrency group so their pushes do not overlap. They use Go
+1.27.1; CI also tests Go 1.22.12, preserving the module's Go 1.22 minimum.
+
+All plugin flakes follow the root nixpkgs input. After updating the root lock,
+refresh the plugin locks with `nix flake update --flake ./tools/<tool>` for each
+tool. CI validates all twelve committed plugin locks without updating them.
 
 ## License
 
