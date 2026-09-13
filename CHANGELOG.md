@@ -4,8 +4,8 @@
 
 **Highlights:** Restore automatic tool updates and refresh the packaged releases.
 
-- Keep package expressions intact when an update fails, reject missing or duplicate source fields, and publish successful tool updates even if another upstream fails.
 - Refresh nixpkgs, share its pin across all twelve plugins, and use pinned Go toolchains with serialized maintenance workflows and minimum-version CI coverage.
+- Keep package expressions intact when an update fails, reject missing or duplicate source fields, and publish successful tool updates even if another upstream fails.
 - Restore summarize updates with pnpm 11 lockfiles using the maintained reproducible dependency fetcher and Node 24, and show Nix diagnostics when hash discovery fails.
 - Update summarize to 0.21.14, discrawl to 0.15.0, wacrawl to 0.3.12, gogcli to 0.40.0, Peekaboo to 4.3.4, poltergeist to 2.1.7, and imsg to 0.15.4.
 - Preserve imsg's resource bundles and bridge helper, and Peekaboo's bundled Swift compatibility library when installing macOS release assets.
