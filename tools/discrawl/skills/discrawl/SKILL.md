@@ -1,74 +1,74 @@
 ---
 name: discrawl
-description: Mirror Discord guild history into local SQLite and query it offline with search, messages, mentions, reports, and DM wiretap import.
-homepage: https://github.com/openclaw/discrawl
+description: "Discord archive: search, sync freshness, DMs, summaries, TUI, repo/release work."
 metadata:
-  {
-    "openclaw":
-      {
-        "emoji": "🛰️",
-        "requires": { "bins": ["discrawl"] },
-        "install":
-          [
-            {
-              "id": "brew",
-              "kind": "brew",
-              "formula": "steipete/tap/discrawl",
-              "bins": ["discrawl"],
-              "label": "Install discrawl (brew)",
-            },
-          ],
-      },
-  }
+  openclaw:
+    homepage: https://github.com/openclaw/discrawl
+    requires:
+      bins:
+        - discrawl
+    install:
+      - kind: go
+        module: github.com/openclaw/discrawl/cmd/discrawl@latest
+        bins:
+          - discrawl
 ---
 
-# discrawl
+# Discrawl
 
-Use `discrawl` to mirror Discord guild data into local SQLite, then query it offline.
+Use local Discord archives first. For recent/current questions, check
+`discrawl status --json`; use `discrawl doctor` for source/config readiness.
+Refresh only when stale, missing the requested scope, or explicitly requested.
 
-## When to Use
+```bash
+discrawl sync --source wiretap  # local Discord Desktop artifacts
+discrawl sync                   # configured source; bot API requires credentials
+```
 
-Use this skill when the user wants to:
+Use `--full` only for deliberate historical backfills. Do not interrupt another
+archive writer to resolve a busy/locked database. Resolve configured paths
+instead of assuming default macOS, XDG, or legacy locations.
 
-- search Discord history locally without relying on Discord search
-- archive a guild into SQLite for later queries
-- inspect recent messages, mentions, channels, or members from a local archive
-- import local Discord Desktop cache data for DM recovery/search
-- publish or subscribe to a Git-backed Discord archive snapshot
+## Read Bounded Slices
 
-## Requirements
+```bash
+DISCRAWL_NO_AUTO_UPDATE=1 discrawl search --limit 20 "query"
+discrawl messages --channel '<channel>' --days 7 --all
+discrawl dms --last 20
+DISCRAWL_NO_AUTO_UPDATE=1 discrawl --json sql "select count(*) as messages from messages;"
+```
 
-- Discord bot token for guild sync, or an existing OpenClaw Discord config
-- local Discord Desktop cache files only if using `wiretap`
-- enough local disk for SQLite archive growth
+`DISCRAWL_NO_AUTO_UPDATE=1` suppresses git-share updates during read smokes.
+`discrawl sql` is read-only by default and accepts SQL arguments or stdin. Use
+it for exact counts/joins when normal reads are too coarse; never use
+`--unsafe --confirm` without an explicitly requested and reviewed database
+mutation. Consult subcommand help for filters. Report absolute date spans,
+channel/DM names, counts, freshness, and source gaps.
 
-## Setup
+## Source Boundaries
 
-- Default config: `~/.discrawl/config.toml`
-- Default database: `~/.discrawl/discrawl.db`
-- Fastest setup when OpenClaw already has Discord configured:
-  - `discrawl init --from-openclaw ~/.openclaw/openclaw.json`
-- Env-only setup:
-  - `export DISCORD_BOT_TOKEN="..."`
-  - `discrawl init`
+Desktop wiretap reads local artifacts; it must not extract credentials, use
+user tokens, call Discord as the user, or write Discord application storage.
+Bot sync needs configured bot credentials; never infer availability. Desktop
+DMs are local-only, not part of the published Git snapshot. Git-share snapshots
+must exclude secrets and `@me` DM rows.
 
-## Common Commands
+For implementation work or a genuinely missing CLI feature, verify the checkout
+remote is `openclaw/discrawl` and follow its instructions. Do not assume a
+machine-specific historical checkout path.
 
-- Doctor: `discrawl doctor`
-- Initial history: `discrawl sync --full`
-- Incremental refresh: `discrawl sync`
-- Live tail: `discrawl tail`
-- Search: `discrawl search "panic nil pointer"`
-- Recent channel messages: `discrawl messages --channel general --hours 24`
-- Mentions: `discrawl mentions --user <user-id>`
-- DM cache import: `discrawl wiretap`
-- Local DM search: `discrawl dms --search "launch checklist"`
-- Read-only SQL: `discrawl sql "select count(*) from messages"`
-- Git-backed reader mode: `discrawl subscribe <private-repo-url>`
+## ClawSweeper Sandbox
 
-## Notes
+Use the sandbox reader only:
 
-- Bot-token sync reads only guilds/channels the bot can access.
-- `wiretap` uses local Discord Desktop cache files only; it does not use a user token.
-- Prefer `discrawl doctor` before a first sync.
-- Use `sync --full` once for backfill, then plain `sync` for routine refreshes.
+```bash
+discrawl-sandbox search --limit 20 "query"
+discrawl-sandbox messages --channel clawtributors --days 7 --all
+discrawl-sandbox status --json
+```
+
+This reader imports `https://github.com/openclaw/discord-store.git` into
+`/root/clawsweeper-sandbox-workspace/.discrawl/discrawl.db` with
+`discord.token_source = "none"`. The published Git snapshot is public-channel
+filtered; do not use `/root/.discrawl/config.toml` or the rich writer DB from
+sandboxed public Discord sessions.

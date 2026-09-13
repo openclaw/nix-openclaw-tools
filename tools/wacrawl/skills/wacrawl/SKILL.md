@@ -1,69 +1,77 @@
 ---
 name: wacrawl
-description: Read-only local archive and search for WhatsApp Desktop chats, messages, and media metadata.
-homepage: https://github.com/steipete/wacrawl
-metadata:
-  {
-    "openclaw":
-      {
-        "emoji": "💬",
-        "requires": { "bins": ["wacrawl"] },
-        "install":
-          [
-            {
-              "id": "brew",
-              "kind": "brew",
-              "formula": "steipete/tap/wacrawl",
-              "bins": ["wacrawl"],
-              "label": "Install wacrawl (brew)",
-            },
-          ],
-      },
-  }
+description: "wacrawl: WhatsApp Desktop archive import/search, slices, backups, repo/release work."
 ---
 
-# wacrawl
+# Wacrawl
 
-Use `wacrawl` to snapshot local WhatsApp Desktop data into a separate SQLite archive and search it offline.
+Use this for WhatsApp Desktop archive questions. `wacrawl` is read-only against WhatsApp data and writes only its own archive.
 
-## When to Use
+## Sources
 
-Use this skill when the user wants to:
+- DB: `~/.wacrawl/wacrawl.db`
+- Source: `~/Library/Group Containers/group.net.whatsapp.WhatsApp.shared`
+- Repo: `~/Projects/wacrawl`
+- CLI: `wacrawl`
 
-- inspect local WhatsApp Desktop history without opening the app
-- archive chats into a local SQLite database for repeat queries
-- search WhatsApp messages locally with filters
-- list chats, recent messages, or archive status from a read-only import
+## Refresh
 
-## Requirements
+Check source/archive health:
 
-- local WhatsApp Desktop data on the same machine
-- enough local disk for `~/.wacrawl/wacrawl.db`
-- understand that this is read-only inspection, not message sending
+```bash
+wacrawl doctor
+```
 
-## Setup
+Import a fresh local snapshot:
 
-- Default source: `~/Library/Group Containers/group.net.whatsapp.WhatsApp.shared`
-- Default archive DB: `~/.wacrawl/wacrawl.db`
-- First sanity check:
-  - `wacrawl doctor`
-- First import:
-  - `wacrawl import`
+```bash
+wacrawl import
+```
 
-## Common Commands
+Inspect counts:
 
-- Doctor: `wacrawl doctor`
-- Import fresh snapshot: `wacrawl import`
-- Archive status: `wacrawl status`
-- List chats: `wacrawl chats --limit 20`
-- Recent messages: `wacrawl messages --limit 20`
-- One chat: `wacrawl messages --chat 1234567890@s.whatsapp.net --limit 50`
-- Search: `wacrawl search "release notes"`
-- Filtered search: `wacrawl --json search "invoice" --from-them --after 2026-01-01`
+```bash
+wacrawl status
+```
 
-## Notes
+Encrypted Git backup:
 
-- `wacrawl` is read-only and does not send messages.
-- It copies WhatsApp SQLite files into a temp snapshot before import.
-- Use `--source` to override the WhatsApp Desktop container path.
-- Use `--db` to archive somewhere other than `~/.wacrawl/wacrawl.db`.
+```bash
+wacrawl backup status
+wacrawl backup push
+```
+
+## Query Workflow
+
+1. Refresh/import if the question depends on recent WhatsApp state.
+2. Resolve chat, sender, date range, media needs, and keyword.
+3. Use CLI for chats/messages/search; use JSON for scripts.
+4. Report exact date spans, counts, chat names/JIDs, and import freshness.
+
+Common commands:
+
+```bash
+wacrawl chats --limit 20
+wacrawl messages --after 2026-01-01 --limit 50
+wacrawl --json search "query" --from-them
+```
+
+## Safety
+
+Do not write into the WhatsApp app container. Do not send messages; this tool is archive/read-only.
+
+## Verification
+
+For repo edits:
+
+```bash
+go test ./...
+make test
+```
+
+Then smoke:
+
+```bash
+wacrawl doctor
+wacrawl status
+```
