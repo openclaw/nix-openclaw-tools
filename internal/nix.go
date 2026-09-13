@@ -17,10 +17,6 @@ type PrefetchResult struct {
 	Hash string `json:"hash"`
 }
 
-type PrefetchGitHubResult struct {
-	Hash string `json:"hash"`
-}
-
 func PrefetchHash(url string) (string, error) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -49,7 +45,7 @@ func PrefetchGitHub(owner, repo, rev string) (string, error) {
 		return "", fmt.Errorf("prefetch github returned non-json: %s", raw)
 	}
 	payload := raw[start : end+1]
-	var res PrefetchGitHubResult
+	var res PrefetchResult
 	if err := json.Unmarshal([]byte(payload), &res); err != nil {
 		return "", err
 	}
