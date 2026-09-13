@@ -1,13 +1,34 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"time"
 
 	"github.com/openclaw/nix-openclaw-tools/internal"
 )
+
+type toolUpdate struct {
+	name string
+	run  func() error
+}
+
+func runUpdates(updates []toolUpdate) error {
+	var failures []error
+	for _, update := range updates {
+		if err := update.run(); err != nil {
+			failures = append(failures, fmt.Errorf("update %s failed: %w", update.name, err))
+			if errors.Is(err, context.Canceled) {
+				break
+			}
+		}
+	}
+	return errors.Join(failures...)
+}
 
 func main() {
 	flag.DurationVar(&internal.PrefetchTimeout, "prefetch-timeout", 10*time.Minute, "deadline per Nix prefetch (0 disables)")
@@ -21,16 +42,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := updateSummarize(repoRoot); err != nil {
-		log.Fatalf("update summarize failed: %v", err)
-	}
-	if err := updateQMD(repoRoot); err != nil {
-		log.Fatalf("update qmd failed: %v", err)
+	updates := []toolUpdate{
+		{"summarize", func() error { return updateSummarize(repoRoot) }},
+		{"qmd", func() error { return updateQMD(repoRoot) }},
 	}
 	for _, tool := range releaseTools(repoRoot) {
-		if err := updateTool(tool); err != nil {
-			log.Fatalf("update %s failed: %v", tool.Name, err)
-		}
+		updates = append(updates, toolUpdate{tool.Name, func() error { return updateTool(tool) }})
 	}
-
+	if err := runUpdates(updates); err != nil {
+		log.Fatal(err)
+	}
 }

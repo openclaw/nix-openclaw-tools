@@ -53,51 +53,53 @@ func qmdNodeModulesHash(upstreamFlake, system string) (string, error) {
 func updateQMD(repoRoot string) error {
 	log.Printf("[update-tools] qmd")
 	qmdFile := filepath.Join(repoRoot, "nix", "pkgs", "qmd.nix")
-	currentVersion, err := readVersion(qmdFile)
-	if err != nil {
-		return err
-	}
+	return editPackage(qmdFile, func(e *nixExpression) error {
+		match := versionPattern.FindStringSubmatch(e.text)
+		if len(match) < 2 {
+			return fmt.Errorf("version not found in %s", qmdFile)
+		}
+		currentVersion := match[1]
 
-	rel, err := internal.LatestRelease("tobi/qmd")
-	if err != nil {
-		return err
-	}
-	version := strings.TrimPrefix(rel.TagName, "v")
-	if currentVersion == version {
-		return nil
-	}
-
-	srcHash, err := internal.PrefetchGitHub("tobi", "qmd", "v"+version)
-	if err != nil {
-		return err
-	}
-	upstreamFlake, err := fetchText(fmt.Sprintf("https://raw.githubusercontent.com/tobi/qmd/v%s/flake.nix", version))
-	if err != nil {
-		return err
-	}
-	nodeHashes := map[string]string{}
-	for _, system := range []string{"aarch64-darwin", "x86_64-linux"} {
-		hash, err := qmdNodeModulesHash(upstreamFlake, system)
+		rel, err := internal.LatestRelease("tobi/qmd")
 		if err != nil {
 			return err
 		}
-		nodeHashes[system] = hash
-	}
+		version := strings.TrimPrefix(rel.TagName, "v")
+		if currentVersion == version {
+			return nil
+		}
 
-	if err := internal.ReplaceOnce(qmdFile, regexp.MustCompile(`version = "[^"]+";`), fmt.Sprintf(`version = "%s";`, version)); err != nil {
-		return err
-	}
-	srcRe := regexp.MustCompile(`(?s)src = fetchFromGitHub \{.*?hash = "sha256-[^"]+";`)
-	if err := internal.ReplaceOnceFunc(qmdFile, srcRe, func(s string) string {
-		return regexp.MustCompile(`hash = "sha256-[^"]+";`).ReplaceAllString(s, fmt.Sprintf(`hash = "%s";`, srcHash))
-	}); err != nil {
-		return err
-	}
-	for system, hash := range nodeHashes {
-		re := regexp.MustCompile(fmt.Sprintf(`"%s" = "sha256-[^"]+";`, regexp.QuoteMeta(system)))
-		if err := internal.ReplaceOnce(qmdFile, re, fmt.Sprintf(`"%s" = "%s";`, system, hash)); err != nil {
+		srcHash, err := internal.PrefetchGitHub("tobi", "qmd", "v"+version)
+		if err != nil {
 			return err
 		}
-	}
-	return nil
+		upstreamFlake, err := fetchText(fmt.Sprintf("https://raw.githubusercontent.com/tobi/qmd/v%s/flake.nix", version))
+		if err != nil {
+			return err
+		}
+		nodeHashes := map[string]string{}
+		for _, system := range []string{"aarch64-darwin", "x86_64-linux"} {
+			hash, err := qmdNodeModulesHash(upstreamFlake, system)
+			if err != nil {
+				return err
+			}
+			nodeHashes[system] = hash
+		}
+
+		if err := e.replace(versionPattern, fmt.Sprintf(`version = "%s";`, version)); err != nil {
+			return err
+		}
+		srcRe := regexp.MustCompile(`(?s)src = fetchFromGitHub \{.*?\};`)
+		if err := e.replaceInBlock(srcRe, hashPattern, fmt.Sprintf(`hash = "%s";`, srcHash)); err != nil {
+			return err
+		}
+
+		for system, hash := range nodeHashes {
+			re := regexp.MustCompile(fmt.Sprintf(`"%s" = "sha256-[^"]+";`, regexp.QuoteMeta(system)))
+			if err := e.replace(re, fmt.Sprintf(`"%s" = "%s";`, system, hash)); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }

@@ -60,7 +60,7 @@ func NixBuildSummarize() (string, error) {
 }
 
 func NixBuildSummarizeSystem(system string) (string, error) {
-	args := []string{"build", ".#summarize"}
+	args := []string{"build", ".#summarize", "--no-link"}
 	if system != "" {
 		args = append(args, "--system", system)
 	}
