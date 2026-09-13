@@ -89,13 +89,13 @@ inputs.nix-openclaw-tools.packages.x86_64-linux.wacrawl
 
 ## Skills syncing
 
-Skills are vendored from [openclaw/openclaw](https://github.com/openclaw/openclaw) main branch. No pinning - we track latest.
+Ten skills are vendored from [openclaw/openclaw](https://github.com/openclaw/openclaw) main and track its latest content. QMD and poltergeist skills are maintained in this repository.
 
 ```bash
 go run ./cmd/sync-skills
 ```
 
-Pulls latest main via sparse checkout, only updates files when contents actually change.
+Pulls latest main via sparse checkout, only updates files when contents actually change. The upstream paths are listed in `cmd/sync-skills/main.go`; edit upstream for changes to vendored skills.
 
 ## Tool updates
 

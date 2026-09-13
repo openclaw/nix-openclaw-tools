@@ -27,14 +27,11 @@ let
     hash = "sha256-tTFK56Iv5lPArwjoEfE0Ts+lttWzBoT3nC27WeVY3dM=";
   };
 
-  pnpmDeps = (fetchPnpmDeps {
-    pname = pname;
-    version = version;
-    src = src;
-    inherit pnpm;
+  pnpmDeps = fetchPnpmDeps {
+    inherit pname version src pnpm;
     hash = "sha256-wj/XNTJHSgINkL3lMNrhurFdfAUavaVargB3w7+UP88=";
     fetcherVersion = 4;
-  });
+  };
 
   meta = with lib; {
     description = "Link → clean text → summary";
@@ -44,7 +41,7 @@ let
     mainProgram = "summarize";
   };
 in
-if stdenv.isLinux then
+if stdenv.hostPlatform.isLinux then
   stdenv.mkDerivation {
     inherit pname version src meta pnpmDeps;
 
@@ -83,14 +80,6 @@ if stdenv.isLinux then
       runHook postBuild
     '';
 
-    preFixup = ''
-      echo "summarize: fixup start $(date -Is)"
-    '';
-
-    postFixup = ''
-      echo "summarize: fixup done $(date -Is)"
-    '';
-
     installPhase = ''
       runHook preInstall
       mkdir -p "$out/libexec" "$out/libexec/packages" "$out/libexec/apps" "$out/bin"
@@ -107,8 +96,7 @@ if stdenv.isLinux then
   }
 else
   stdenv.mkDerivation {
-    pname = pname;
-    version = version;
+    inherit pname version;
     src = fetchurl binSources.${stdenv.hostPlatform.system};
 
     dontConfigure = true;
