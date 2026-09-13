@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -57,7 +58,7 @@ func TestSkillMappingsIncludeGoplacesAndMovedImsg(t *testing.T) {
 	}
 }
 
-func TestSyncFromCopiesGoplacesAndMovedImsg(t *testing.T) {
+func TestSyncFromCopiesAvailableSkillsAndReportsMissing(t *testing.T) {
 	src := t.TempDir()
 	repo := t.TempDir()
 	writeSkill(t, src, "skills/goplaces/SKILL.md", "goplaces-upstream")
@@ -66,8 +67,8 @@ func TestSyncFromCopiesGoplacesAndMovedImsg(t *testing.T) {
 	writeSkill(t, repo, "tools/imsg/skills/imsg/SKILL.md", "stale-imsg")
 
 	updated, err := syncFrom(src, repo, skillMappings)
-	if err != nil {
-		t.Fatal(err)
+	if err == nil || !strings.Contains(err.Error(), "skills/summarize") {
+		t.Fatalf("expected missing upstream skill error, got %v", err)
 	}
 	if !updated {
 		t.Fatal("expected updates")
@@ -77,5 +78,45 @@ func TestSyncFromCopiesGoplacesAndMovedImsg(t *testing.T) {
 	}
 	if got := readSkill(t, repo, "tools/imsg/skills/imsg/SKILL.md"); got != "imsg-upstream" {
 		t.Fatalf("imsg dest = %q", got)
+	}
+}
+
+func TestDiscrawlMappingUsesCurrentUpstreamPath(t *testing.T) {
+	mapping, ok := mappingByTool("discrawl")
+	if !ok || mapping.Up != ".agents/skills/discrawl" {
+		t.Fatalf("discrawl mapping = %#v", mapping)
+	}
+}
+
+func TestSyncCurrentArchiveSkillsAndRepeat(t *testing.T) {
+	dest := t.TempDir()
+	for _, source := range skillSources {
+		src := t.TempDir()
+		for _, mapping := range source.Mappings {
+			writeSkill(t, src, filepath.Join(mapping.Up, "SKILL.md"), source.Repo+":"+mapping.Tool)
+		}
+		updated, err := syncFrom(src, dest, source.Mappings)
+		if err != nil || !updated {
+			t.Fatalf("first sync: updated=%t, err=%v", updated, err)
+		}
+		updated, err = syncFrom(src, dest, source.Mappings)
+		if err != nil || updated {
+			t.Fatalf("repeat sync: updated=%t, err=%v", updated, err)
+		}
+	}
+	for tool, want := range map[string]string{"discrawl": "openclaw/openclaw:discrawl", "wacrawl": "openclaw/wacrawl:wacrawl"} {
+		if got := readSkill(t, dest, "tools/"+tool+"/skills/"+tool+"/SKILL.md"); got != want {
+			t.Fatalf("%s = %q, want %q", tool, got, want)
+		}
+	}
+}
+
+func TestSyncReportsUnreadableSource(t *testing.T) {
+	src := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(src, "skills/tool/SKILL.md"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := syncFrom(src, t.TempDir(), []Mapping{{"tool", "skills/tool"}}); err == nil {
+		t.Fatal("expected source read error, not a silent missing-skill skip")
 	}
 }

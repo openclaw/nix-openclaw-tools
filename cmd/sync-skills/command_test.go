@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"syscall"
 	"testing"
@@ -86,5 +87,29 @@ func TestRunKillsHungChild(t *testing.T) {
 		default:
 			time.Sleep(10 * time.Millisecond)
 		}
+	}
+}
+
+func TestSyncMainHelper(t *testing.T) {
+	if os.Getenv("SYNC_MAIN_HELPER") == "1" {
+		main()
+	}
+}
+
+func TestSyncMainCleansFailedClone(t *testing.T) {
+	binDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(binDir, "git"), []byte("#!/bin/sh\nexit 17\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	clones := t.TempDir()
+	cmd := exec.Command(os.Args[0], "-test.run=^TestSyncMainHelper$")
+	cmd.Dir = t.TempDir()
+	cmd.Env = append(os.Environ(), "SYNC_MAIN_HELPER=1", "TMPDIR="+clones, "PATH="+binDir+string(os.PathListSeparator)+os.Getenv("PATH"))
+	if output, err := cmd.CombinedOutput(); err == nil {
+		t.Fatalf("expected failed clone: %s", output)
+	}
+	entries, err := os.ReadDir(clones)
+	if err != nil || len(entries) != 0 {
+		t.Fatalf("failed clone left temporary directories: %v, %v", entries, err)
 	}
 }

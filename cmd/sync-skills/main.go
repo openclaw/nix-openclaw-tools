@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -22,8 +24,7 @@ type Mapping struct {
 
 var skillMappings = []Mapping{
 	{"summarize", "skills/summarize"},
-	{"discrawl", "skills/discrawl"},
-	{"wacrawl", "skills/wacrawl"},
+	{"discrawl", ".agents/skills/discrawl"},
 	{"gogcli", "skills/gog"},
 	{"goplaces", "skills/goplaces"},
 	{"camsnap", "skills/camsnap"},
@@ -33,34 +34,49 @@ var skillMappings = []Mapping{
 	{"imsg", "extensions/imessage/skills/imsg"},
 }
 
+type skillSource struct {
+	Repo     string
+	Mappings []Mapping
+}
+
+var skillSources = []skillSource{
+	{Repo: "openclaw/openclaw", Mappings: skillMappings},
+	{Repo: "openclaw/wacrawl", Mappings: []Mapping{{"wacrawl", ".agents/skills/wacrawl"}}},
+}
+
 func destSkillPath(repoRoot string, m Mapping) string {
 	return filepath.Join(repoRoot, "tools", m.Tool, "skills", filepath.Base(m.Up), "SKILL.md")
 }
 
 func syncFrom(srcRoot, repoRoot string, mappings []Mapping) (bool, error) {
 	updated := false
+	var missing []error
 	for _, m := range mappings {
 		src := filepath.Join(srcRoot, m.Up, "SKILL.md")
 		dest := destSkillPath(repoRoot, m)
-		if _, err := os.Stat(src); err != nil {
+		upstream, err := os.ReadFile(src)
+		if errors.Is(err, os.ErrNotExist) {
 			log.Printf("[sync-skills] missing %s", src)
+			missing = append(missing, fmt.Errorf("read %s: %w", src, err))
 			continue
 		}
-		same := false
-		if b1, err1 := os.ReadFile(src); err1 == nil {
-			if b2, err2 := os.ReadFile(dest); err2 == nil && bytes.Equal(b1, b2) {
-				same = true
-			}
+		if err != nil {
+			return updated, fmt.Errorf("read %s: %w", src, err)
 		}
-		if !same {
-			if err := copyFile(src, dest); err != nil {
-				return updated, fmt.Errorf("copy %s -> %s: %v", src, dest, err)
-			}
-			updated = true
-			log.Printf("[sync-skills] updated %s", m.Tool)
+		local, err := os.ReadFile(dest)
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
+			return updated, fmt.Errorf("read %s: %w", dest, err)
 		}
+		if err == nil && bytes.Equal(upstream, local) {
+			continue
+		}
+		if err := copyFile(src, dest); err != nil {
+			return updated, fmt.Errorf("copy %s -> %s: %w", src, dest, err)
+		}
+		updated = true
+		log.Printf("[sync-skills] updated %s", m.Tool)
 	}
-	return updated, nil
+	return updated, errors.Join(missing...)
 }
 
 func run(dir string, name string, args ...string) error {
@@ -91,6 +107,51 @@ func copyFile(src, dst string) error {
 	return out.Close()
 }
 
+func syncSource(repoRoot string, source skillSource) (updated bool, err error) {
+	workdir, err := os.MkdirTemp("", "openclaw-skills-")
+	if err != nil {
+		return false, err
+	}
+	defer func() {
+		if cleanupErr := os.RemoveAll(workdir); cleanupErr != nil {
+			err = errors.Join(err, fmt.Errorf("clean clone: %w", cleanupErr))
+		}
+	}()
+
+	log.Printf("[sync-skills] cloning %s main", source.Repo)
+	if err := run("", "git", "clone", "--depth", "1", "--filter=blob:none", "--sparse", "https://github.com/"+source.Repo+".git", workdir); err != nil {
+		return false, err
+	}
+	paths := make([]string, 0, len(source.Mappings))
+	for _, m := range source.Mappings {
+		paths = append(paths, m.Up)
+	}
+	args := append([]string{"sparse-checkout", "set"}, paths...)
+	if err := run(workdir, "git", args...); err != nil {
+		return false, err
+	}
+	return syncFrom(workdir, repoRoot, source.Mappings)
+}
+
+func syncSkills(repoRoot string) error {
+	updated := false
+	var failures []error
+	for _, source := range skillSources {
+		changed, err := syncSource(repoRoot, source)
+		updated = updated || changed
+		if err != nil {
+			failures = append(failures, fmt.Errorf("sync %s: %w", source.Repo, err))
+			if errors.Is(err, context.Canceled) {
+				break
+			}
+		}
+	}
+	if len(failures) == 0 && !updated {
+		log.Printf("[sync-skills] no changes")
+	}
+	return errors.Join(failures...)
+}
+
 func main() {
 	flag.DurationVar(&runTimeout, "git-timeout", 5*time.Minute, "deadline per Git command (0 disables)")
 	flag.Parse()
@@ -101,30 +162,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	workdir, err := os.MkdirTemp("", "openclaw-skills-")
-	if err != nil {
+	if err := syncSkills(repoRoot); err != nil {
 		log.Fatal(err)
-	}
-	defer os.RemoveAll(workdir)
-
-	log.Printf("[sync-skills] cloning openclaw main")
-	if err := run("", "git", "clone", "--depth", "1", "--filter=blob:none", "--sparse", "https://github.com/openclaw/openclaw.git", workdir); err != nil {
-		log.Fatal(err)
-	}
-	paths := []string{}
-	for _, m := range skillMappings {
-		paths = append(paths, m.Up)
-	}
-	args := append([]string{"sparse-checkout", "set"}, paths...)
-	if err := run(workdir, "git", args...); err != nil {
-		log.Fatal(err)
-	}
-
-	updated, err := syncFrom(workdir, repoRoot, skillMappings)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if !updated {
-		log.Printf("[sync-skills] no changes")
 	}
 }
