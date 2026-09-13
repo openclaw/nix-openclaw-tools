@@ -4,6 +4,7 @@
 
 **Highlights:** Restore automatic tool updates and refresh the packaged releases.
 
+- Make camsnap find its packaged ffmpeg when launched directly or through an OpenClaw plugin, without relying on the caller's PATH.
 - Refresh nixpkgs, share its pin across all twelve plugins, and use pinned Go toolchains with serialized maintenance workflows and minimum-version CI coverage.
 - Restore summarize updates with pnpm 11 lockfiles using the maintained reproducible dependency fetcher and Node 24, and show Nix diagnostics when hash discovery fails.
 - Update summarize to 0.21.14, discrawl to 0.15.0, wacrawl to 0.3.12, gogcli to 0.40.0, Peekaboo to 4.3.4, poltergeist to 2.1.7, and imsg to 0.15.4.
