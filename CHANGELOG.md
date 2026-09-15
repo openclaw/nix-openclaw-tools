@@ -4,6 +4,7 @@
 
 **Highlights:** Restore automatic tool updates and refresh the packaged releases.
 
+- Restore sag updates after the upstream archive rename and package 0.4.3 using its native Apple Silicon release.
 - Refresh nixpkgs to the September 13 snapshot across the root flake and all twelve plugin locks.
 - Make camsnap find its packaged ffmpeg when launched directly or through an OpenClaw plugin, without relying on the caller's PATH.
 - Refresh nixpkgs, share its pin across all twelve plugins, and use pinned Go toolchains with serialized maintenance workflows and minimum-version CI coverage.
