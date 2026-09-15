@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -73,6 +74,65 @@ sources = {
 		t.Fatal("expected missing asset error")
 	}
 	assertPackageUnchanged(t, path, original)
+}
+
+func TestUpdateSagUsesNativeReleaseAssets(t *testing.T) {
+	const original = `version = "1.0.0";
+sources = {
+  "aarch64-darwin" = { url = "https://example.invalid/old-darwin.tar.gz"; hash = "sha256-old-darwin"; };
+  "x86_64-linux" = { url = "https://example.invalid/old-linux.tar.gz"; hash = "sha256-old-linux"; };
+};`
+	for _, missing := range []string{"", "darwin_arm64", "linux_amd64"} {
+		t.Run("missing="+missing, func(t *testing.T) {
+			var assets []internal.Asset
+			for _, platform := range []string{"darwin_amd64", "universal_darwin_all", "darwin_arm64", "linux_arm64", "linux_amd64"} {
+				if platform != missing {
+					name := "sag_2.0.0_" + platform + ".tar.gz"
+					assets = append(assets, internal.Asset{Name: name, BrowserDownloadURL: "https://example.invalid/" + name})
+				}
+			}
+			data, err := json.Marshal(assets)
+			if err != nil {
+				t.Fatal(err)
+			}
+			releaseFixture(t, string(data))
+			root, path := packageFixture(t, "sag", original)
+			var sag Tool
+			for _, tool := range releaseTools(root) {
+				if tool.Name == "sag" {
+					sag = tool
+				}
+			}
+			if sag.Name == "" {
+				t.Fatal("sag missing from release catalog")
+			}
+			err = updateTool(sag)
+			if missing != "" {
+				if err == nil || !strings.Contains(err.Error(), "no asset matched for sag") {
+					t.Fatalf("expected missing asset error, got %v", err)
+				}
+				assertPackageUnchanged(t, path, original)
+				return
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			got, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			want := strings.NewReplacer(
+				`version = "1.0.0"`, `version = "2.0.0"`,
+				"old-darwin.tar.gz", "sag_2.0.0_darwin_arm64.tar.gz",
+				"old-linux.tar.gz", "sag_2.0.0_linux_amd64.tar.gz",
+				"sha256-old-darwin", "sha256-new",
+				"sha256-old-linux", "sha256-new",
+			).Replace(original)
+			if string(got) != want {
+				t.Fatalf("updated package:\n%s\nwant:\n%s", got, want)
+			}
+		})
+	}
 }
 
 func TestUpdateToolRejectsMissingHashWithoutChangingPackage(t *testing.T) {

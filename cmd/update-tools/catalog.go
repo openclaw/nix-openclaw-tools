@@ -88,7 +88,7 @@ func releaseTools(repoRoot string) []Tool {
 			Name: "sag",
 			Repo: "steipete/sag",
 			Assets: []AssetSpec{
-				{System: "aarch64-darwin", Regex: regexp.MustCompile(`sag_[0-9.]+_darwin_universal\.tar\.gz`)},
+				{System: "aarch64-darwin", Regex: regexp.MustCompile(`sag_[0-9.]+_darwin_arm64\.tar\.gz`)},
 				{System: "x86_64-linux", Regex: regexp.MustCompile(`sag_[0-9.]+_linux_amd64\.tar\.gz`)},
 			},
 			NixFile: filepath.Join(repoRoot, "nix", "pkgs", "sag.nix"),
