@@ -22,13 +22,7 @@ func updateSummarize(repoRoot string) error {
 			return err
 		}
 		version := strings.TrimPrefix(rel.TagName, "v")
-		var assetURL string
-		for _, a := range rel.Assets {
-			if matched, _ := regexp.MatchString(`summarize-macos-arm64-v[0-9.]+\.tar\.gz`, a.Name); matched {
-				assetURL = a.BrowserDownloadURL
-				break
-			}
-		}
+		assetURL := findAssetURL(rel, regexp.MustCompile(`summarize-macos-arm64-v[0-9.]+\.tar\.gz`))
 		if assetURL == "" {
 			return fmt.Errorf("no asset matched for summarize")
 		}

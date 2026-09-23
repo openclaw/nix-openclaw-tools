@@ -113,6 +113,8 @@ go run ./cmd/update-tools
 ```
 
 Fetches latest release versions/URLs/hashes and updates the Nix expressions.
+Asset patterns match complete filenames, excluding checksum/signature sidecars
+and prefixed variants of the expected archives.
 
 Each package update is committed only after all of its source fields and hashes
 are ready. A failed update leaves that package unchanged; other tools still get

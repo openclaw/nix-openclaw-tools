@@ -21,6 +21,16 @@ type AssetSpec struct {
 	Regex  *regexp.Regexp
 }
 
+func findAssetURL(rel *internal.Release, pattern *regexp.Regexp) string {
+	pattern = regexp.MustCompile(`^(?:` + pattern.String() + `)$`)
+	for _, asset := range rel.Assets {
+		if pattern.MatchString(asset.Name) {
+			return asset.BrowserDownloadURL
+		}
+	}
+	return ""
+}
+
 func updateTool(tool Tool) error {
 	log.Printf("[update-tools] %s", tool.Name)
 	return editPackage(tool.NixFile, func(e *nixExpression) error {
@@ -34,13 +44,7 @@ func updateTool(tool Tool) error {
 		}
 
 		for _, asset := range tool.Assets {
-			var assetURL string
-			for _, a := range rel.Assets {
-				if asset.Regex.MatchString(a.Name) {
-					assetURL = a.BrowserDownloadURL
-					break
-				}
-			}
+			assetURL := findAssetURL(rel, asset.Regex)
 			if assetURL == "" {
 				return fmt.Errorf("no asset matched for %s (%s)", tool.Name, asset.System)
 			}
