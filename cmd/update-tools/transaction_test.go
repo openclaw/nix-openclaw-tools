@@ -76,6 +76,63 @@ sources = {
 	assertPackageUnchanged(t, path, original)
 }
 
+func TestUpdatesMatchWholeAssetNames(t *testing.T) {
+	const original = `version = "1.0.0";
+sources = { "aarch64-darwin" = { url = "https://example.invalid/old.tar.gz"; hash = "sha256-old"; }; };
+src = fetchurl { url = "https://example.invalid/source.tar.gz"; hash = "sha256-old-source"; };
+pnpmDeps = fetchPnpmDeps { hash = "sha256-old-deps"; };`
+	for _, name := range []string{"tool", "summarize"} {
+		for _, archivePresent := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/archivePresent=%t", name, archivePresent), func(t *testing.T) {
+				archive := name + "-macos-arm64-v2.0.0.tar.gz"
+				var assets []internal.Asset
+				for _, asset := range []string{archive + ".sha256", archive + ".sig", "debug-" + archive} {
+					assets = append(assets, internal.Asset{Name: asset, BrowserDownloadURL: "https://example.invalid/" + asset})
+				}
+				if archivePresent {
+					assets = append(assets, internal.Asset{Name: archive, BrowserDownloadURL: "https://example.invalid/" + archive})
+				}
+				data, err := json.Marshal(assets)
+				if err != nil {
+					t.Fatal(err)
+				}
+				releaseFixture(t, string(data))
+				bin := t.TempDir()
+				const nix = "#!/bin/sh\nif [ \"$1\" = build ]; then\n  echo 'got: sha256-new-deps' >&2\n  exit 1\nfi\nprintf '%s\\n' '{\"hash\":\"sha256-new\"}'\n"
+				if err := os.WriteFile(filepath.Join(bin, "nix"), []byte(nix), 0o755); err != nil {
+					t.Fatal(err)
+				}
+				t.Setenv("PATH", bin+string(os.PathListSeparator)+os.Getenv("PATH"))
+				root, path := packageFixture(t, name, original)
+				if name == "summarize" {
+					err = updateSummarize(root)
+				} else {
+					err = updateTool(Tool{Name: name, Repo: "owner/tool", NixFile: path, Assets: []AssetSpec{
+						{System: "aarch64-darwin", Regex: regexp.MustCompile(`tool-macos-arm64-v[0-9.]+\.tar\.gz`)},
+					}})
+				}
+				if !archivePresent {
+					if err == nil || !strings.Contains(err.Error(), "no asset matched") {
+						t.Fatalf("expected missing archive error, got %v", err)
+					}
+					assertPackageUnchanged(t, path, original)
+					return
+				}
+				if err != nil {
+					t.Fatal(err)
+				}
+				got, err := os.ReadFile(path)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if !strings.Contains(string(got), `url = "https://example.invalid/`+archive+`"; hash = "sha256-new";`) {
+					t.Fatalf("package did not select the archive: %s", got)
+				}
+			})
+		}
+	}
+}
+
 func TestUpdateSagUsesNativeReleaseAssets(t *testing.T) {
 	const original = `version = "1.0.0";
 sources = {
