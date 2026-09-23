@@ -5,7 +5,7 @@
 Nix packaging for OpenClaw-adjacent tools, with per-tool OpenClaw plugin metadata. Part of the [nix-openclaw](https://github.com/openclaw/nix-openclaw) ecosystem.
 
 Darwin/aarch64 plus Linux (x86_64/aarch64) for tools that ship Linux builds.
-On Linux, `summarize` is built from source (Node 24 + pnpm 11.25.0, matching upstream's package manager) since upstream only ships a macOS Bun binary.
+On Linux, `summarize` is built from source (Node 24 + pnpm 11, matching upstream's package manager) since upstream only ships a macOS Bun binary.
 
 ## Why this exists
 
