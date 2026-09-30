@@ -116,6 +116,11 @@ Fetches latest release versions/URLs/hashes and updates the Nix expressions.
 Asset patterns match complete filenames, excluding checksum/signature sidecars
 and prefixed variants of the expected archives.
 
+Peekaboo currently uses 4.5.0 to preserve macOS 15 support. Its 4.6.0 release
+binary imports `swift_initBorrow` from a newer system Swift runtime and fails
+before startup on macOS 15. The updater skips that exact release with a logged
+reason; later releases remain eligible for updates and the macOS runtime check.
+
 Each package update is committed only after all of its source fields and hashes
 are ready. A failed update leaves that package unchanged; other tools still get
 checked. Automation publishes the successful updates while keeping the run red

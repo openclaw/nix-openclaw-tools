@@ -71,6 +71,9 @@ func releaseTools(repoRoot string) []Tool {
 		{
 			Name: "peekaboo",
 			Repo: "openclaw/Peekaboo",
+			SkipVersions: map[string]string{
+				"4.6.0": "release binary imports swift_initBorrow, which is unavailable on macOS 15",
+			},
 			Assets: []AssetSpec{
 				{System: "aarch64-darwin", Regex: regexp.MustCompile(`peekaboo-macos-(?:arm64|universal)\.tar\.gz`)},
 			},

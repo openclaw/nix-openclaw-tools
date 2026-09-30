@@ -19,8 +19,13 @@ import (
 
 func releaseFixture(t *testing.T, assets string) {
 	t.Helper()
+	releaseFixtureForVersion(t, "v2.0.0", assets)
+}
+
+func releaseFixtureForVersion(t *testing.T, tag, assets string) {
+	t.Helper()
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, `{"tag_name":"v2.0.0","assets":%s}`, assets)
+		fmt.Fprintf(w, `{"tag_name":%q,"assets":%s}`, tag, assets)
 	}))
 	t.Cleanup(server.Close)
 	oldBase, oldClient := internal.GitHubAPIBase, internal.HTTPClient
@@ -32,6 +37,38 @@ func releaseFixture(t *testing.T, assets string) {
 		t.Fatal(err)
 	}
 	t.Setenv("PATH", dir+string(os.PathListSeparator)+os.Getenv("PATH"))
+}
+
+func TestUpdatePeekabooSkipsIncompatibleRelease(t *testing.T) {
+	const original = `version = "4.5.0";
+sources = { "aarch64-darwin" = { url = "https://example.invalid/old.tar.gz"; hash = "sha256-old"; }; };`
+	for _, version := range []string{"4.6.0", "4.6.1"} {
+		t.Run(version, func(t *testing.T) {
+			releaseFixtureForVersion(t, "v"+version, `[{"name":"peekaboo-macos-arm64.tar.gz","browser_download_url":"https://example.invalid/new.tar.gz"}]`)
+			root, path := packageFixture(t, "peekaboo", original)
+			for _, tool := range releaseTools(root) {
+				if tool.Name != "peekaboo" {
+					continue
+				}
+				if err := updateTool(tool); err != nil {
+					t.Fatal(err)
+				}
+				if version == "4.6.0" {
+					assertPackageUnchanged(t, path, original)
+				} else {
+					got, err := os.ReadFile(path)
+					if err != nil {
+						t.Fatal(err)
+					}
+					if !strings.Contains(string(got), `version = "4.6.1";`) || !strings.Contains(string(got), `hash = "sha256-new";`) {
+						t.Fatalf("compatible follow-up was not updated: %s", got)
+					}
+				}
+				return
+			}
+			t.Fatal("peekaboo missing from release catalog")
+		})
+	}
 }
 
 func packageFixture(t *testing.T, name, contents string) (string, string) {

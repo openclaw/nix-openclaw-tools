@@ -10,10 +10,11 @@ import (
 )
 
 type Tool struct {
-	Name    string
-	Repo    string
-	Assets  []AssetSpec
-	NixFile string
+	Name         string
+	Repo         string
+	Assets       []AssetSpec
+	NixFile      string
+	SkipVersions map[string]string
 }
 
 type AssetSpec struct {
@@ -39,6 +40,10 @@ func updateTool(tool Tool) error {
 			return err
 		}
 		version := strings.TrimPrefix(rel.TagName, "v")
+		if reason := tool.SkipVersions[version]; reason != "" {
+			log.Printf("[update-tools] skipping %s %s: %s", tool.Name, version, reason)
+			return nil
+		}
 		if err := e.replace(versionPattern, fmt.Sprintf(`version = "%s";`, version)); err != nil {
 			return err
 		}

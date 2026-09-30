@@ -6,6 +6,7 @@
 
 - Run the full CI matrix after automated tool and skill updates, which GitHub otherwise excludes from push-triggered workflows.
 - Refresh the shared nixpkgs input to the September 28 snapshot across the root flake and all twelve plugin locks.
+- Restore Peekaboo 4.5.0 for macOS 15 and skip the incompatible 4.6.0 release in automation; keep the native runtime check enabled.
 - Match complete release archive names so tool updates cannot select checksum, signature, or prefixed assets in place of the package.
 - Restore sag updates after the upstream archive rename and package 0.4.3 using its native Apple Silicon release.
 - Refresh nixpkgs to the September 13 snapshot across the root flake and all twelve plugin locks.
