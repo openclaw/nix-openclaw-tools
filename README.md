@@ -116,6 +116,11 @@ Fetches latest release versions/URLs/hashes and updates the Nix expressions.
 Asset patterns match complete filenames, excluding checksum/signature sidecars
 and prefixed variants of the expected archives.
 
+Peekaboo currently uses 4.5.0 to preserve macOS 15 support. Its 4.6.0 release
+binary imports `swift_initBorrow` from a newer system Swift runtime and fails
+before startup on macOS 15. The updater skips that exact release with a logged
+reason; later releases remain eligible for updates and the macOS runtime check.
+
 Each package update is committed only after all of its source fields and hashes
 are ready. A failed update leaves that package unchanged; other tools still get
 checked. Automation publishes the successful updates while keeping the run red
@@ -132,7 +137,7 @@ check pull embedding/reranking models; model prewarming belongs in nix-openclaw.
 
 | Workflow | Schedule | What it does |
 |----------|----------|--------------|
-| **CI** | Pull requests and pushes to main | Checks Go formatting, vets, tests with the race detector, builds the maintenance commands and package checks on all supported systems, and tests summarize article extraction |
+| **CI** | Pull requests, pushes to main, and explicit dispatch after automated updates | Checks Go formatting, vets, tests with the race detector, builds the maintenance commands and package checks on all supported systems, and tests summarize article extraction |
 | **sync-skills** | Every 30 min | Pulls latest skills from openclaw main |
 | **update-tools** | Every 10 min | Checks for new tool releases |
 | **Garnix** | On push | Builds all packages via `checks.*` (darwin + linux) |
@@ -140,6 +145,10 @@ check pull embedding/reranking models; model prewarming belongs in nix-openclaw.
 Automation commits directly when versions or skills change. The two maintenance
 workflows share a concurrency group so their pushes do not overlap. They use Go
 1.27.1; CI also tests Go 1.22.12, preserving the module's Go 1.22 minimum.
+
+Maintenance pushes use `GITHUB_TOKEN`, which does not trigger push workflows.
+After publishing changes, both workflows explicitly dispatch CI on `main`.
+Unchanged runs skip dispatch; a failed push or dispatch fails the maintenance run.
 
 All plugin flakes follow the root nixpkgs input. After updating the root lock,
 refresh the plugin locks with `nix flake update --flake ./tools/<tool>` for each

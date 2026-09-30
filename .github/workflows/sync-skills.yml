@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: maintenance-main
@@ -30,13 +31,7 @@ jobs:
         run: go run ./cmd/sync-skills
 
       - name: Commit & push if changed
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if git diff --quiet; then
-            echo "No changes"
-            exit 0
-          fi
-          git config user.name "openclaw-ci"
-          git config user.email "ci@openclaw.local"
-          git add -A
-          git commit -m "chore: sync skills from upstream"
-          git push
+          bash scripts/publish-updates.sh "chore: sync skills from upstream"
