@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: maintenance-main
@@ -37,13 +38,6 @@ jobs:
 
       - name: Commit & push if changed
         if: ${{ !cancelled() && (success() || steps.update.outcome == 'failure') }}
-        run: |
-          if git diff --quiet; then
-            echo "No changes"
-            exit 0
-          fi
-          git config user.name "openclaw-ci"
-          git config user.email "ci@openclaw.local"
-          git add -A
-          git commit -m "chore: update tool releases"
-          git push
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/publish-updates.sh "chore: update tool releases"
