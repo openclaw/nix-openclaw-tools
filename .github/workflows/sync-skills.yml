@@ -33,4 +33,5 @@ jobs:
       - name: Commit & push if changed
         env:
           GH_TOKEN: ${{ github.token }}
-        run: bash scripts/publish-updates.sh "chore: sync skills from upstream"
+        run: |
+          bash scripts/publish-updates.sh "chore: sync skills from upstream"
