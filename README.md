@@ -36,6 +36,7 @@ Homebrew configuration, not in these pure Nix package/module definitions.
 | [**summarize**](https://github.com/steipete/summarize) | Link → clean text → summary |
 | [**discrawl**](https://github.com/openclaw/discrawl) | Mirror Discord into SQLite and search history locally |
 | [**wacrawl**](https://github.com/steipete/wacrawl) | Read-only local archive and search for WhatsApp Desktop data |
+| [**wacli**](https://github.com/openclaw/wacli) | WhatsApp linked-device client for live sync, search, and sending |
 | [**gogcli**](https://github.com/openclaw/gogcli) | Google CLI for Gmail, Calendar, Drive, and Contacts |
 | [**goplaces**](https://github.com/openclaw/goplaces) | Google Places API (New) CLI |
 | [**camsnap**](https://github.com/steipete/camsnap) | Capture snapshots/clips from RTSP/ONVIF cameras |
@@ -57,6 +58,7 @@ programs.openclaw.plugins = [
   { source = "github:openclaw/nix-openclaw-tools?dir=tools/peekaboo"; }
   { source = "github:openclaw/nix-openclaw-tools?dir=tools/summarize"; }
   { source = "github:openclaw/nix-openclaw-tools?dir=tools/wacrawl"; }
+  { source = "github:openclaw/nix-openclaw-tools?dir=tools/wacli"; }
 ];
 ```
 
@@ -80,6 +82,7 @@ inputs.nix-openclaw-tools.packages.aarch64-darwin.camsnap
 inputs.nix-openclaw-tools.packages.aarch64-darwin.discrawl
 inputs.nix-openclaw-tools.packages.aarch64-darwin.peekaboo
 inputs.nix-openclaw-tools.packages.aarch64-darwin.wacrawl
+inputs.nix-openclaw-tools.packages.aarch64-darwin.wacli
 # etc.
 
 # Linux examples:
@@ -88,11 +91,24 @@ inputs.nix-openclaw-tools.packages.x86_64-linux.discrawl
 inputs.nix-openclaw-tools.packages.aarch64-linux.gogcli
 inputs.nix-openclaw-tools.packages.x86_64-linux.summarize
 inputs.nix-openclaw-tools.packages.x86_64-linux.wacrawl
+inputs.nix-openclaw-tools.packages.aarch64-linux.wacli
 ```
+
+Wacli uses upstream release binaries built from `./cmd/wacli` with Go 1.27+,
+CGO enabled, and the `sqlite_fts5` tag. It supports Apple Silicon macOS and both
+Linux architectures; Linux binaries use the packaged Nix dynamic linker and libc.
+The runtime check opens an empty SQLite store and verifies FTS5 and message search
+without connecting to WhatsApp.
+
+Authentication and message data stay outside the Nix store: `~/.wacli` on macOS,
+or `${XDG_STATE_HOME:-~/.local/state}/wacli` on Linux. Wacli also honors an existing
+Linux `~/.wacli` store. Override the location with `--store DIR` or `WACLI_STORE_DIR`.
+The plugin declares the default state directory; configure any custom location in
+your downstream module.
 
 ## Skills syncing
 
-Nine skills track [openclaw/openclaw](https://github.com/openclaw/openclaw) main. The wacrawl skill tracks [openclaw/wacrawl](https://github.com/openclaw/wacrawl) main. QMD and poltergeist skills are maintained in this repository.
+Ten skills track [openclaw/openclaw](https://github.com/openclaw/openclaw) main. The wacrawl skill tracks [openclaw/wacrawl](https://github.com/openclaw/wacrawl) main. QMD and poltergeist skills are maintained in this repository.
 
 ```bash
 go run ./cmd/sync-skills
@@ -152,7 +168,7 @@ Unchanged runs skip dispatch; a failed push or dispatch fails the maintenance ru
 
 All plugin flakes follow the root nixpkgs input. After updating the root lock,
 refresh the plugin locks with `nix flake update --flake ./tools/<tool>` for each
-tool. CI validates all twelve committed plugin locks without updating them.
+tool. CI validates all thirteen committed plugin locks without updating them.
 
 ## License
 

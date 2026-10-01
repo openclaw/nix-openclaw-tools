@@ -104,7 +104,7 @@ func TestSyncCurrentArchiveSkillsAndRepeat(t *testing.T) {
 			t.Fatalf("repeat sync: updated=%t, err=%v", updated, err)
 		}
 	}
-	for tool, want := range map[string]string{"discrawl": "openclaw/openclaw:discrawl", "wacrawl": "openclaw/wacrawl:wacrawl"} {
+	for tool, want := range map[string]string{"discrawl": "openclaw/openclaw:discrawl", "wacrawl": "openclaw/wacrawl:wacrawl", "wacli": "openclaw/openclaw:wacli"} {
 		if got := readSkill(t, dest, "tools/"+tool+"/skills/"+tool+"/SKILL.md"); got != want {
 			t.Fatalf("%s = %q, want %q", tool, got, want)
 		}

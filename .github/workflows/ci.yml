@@ -73,7 +73,7 @@ jobs:
 
       - name: Build and run packages
         run: |
-          for tool in summarize discrawl wacrawl; do
+          for tool in summarize discrawl wacrawl wacli; do
             tool_store="$(nix build ".#$tool" --no-link --print-out-paths --print-build-logs)"
             "$tool_store/bin/$tool" --version
             if [ "$tool" = summarize ]; then
