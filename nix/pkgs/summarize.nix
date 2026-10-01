@@ -14,22 +14,22 @@
 
 let
   pname = "summarize";
-  version = "0.24.0";
+  version = "0.25.0";
   binSources = {
     "aarch64-darwin" = {
-      url = "https://github.com/steipete/summarize/releases/download/v0.24.0/summarize-macos-arm64-v0.24.0.tar.gz";
-      hash = "sha256-xy8W919dPeA/JDeMoU+RGNy28WwWbd8lTSqGLm6wn7k=";
+      url = "https://github.com/steipete/summarize/releases/download/v0.25.0/summarize-macos-arm64-v0.25.0.tar.gz";
+      hash = "sha256-ZMKXou2KLJ6Gk66bdgpykap1DUmj6hsg9ufnVyNBWl4=";
     };
   };
 
   src = fetchurl {
     url = "https://github.com/steipete/summarize/archive/refs/tags/v${version}.tar.gz";
-    hash = "sha256-MkOuv8inm9QX9diVeoYMd8TY6NatIbPoj3heUVVa+e8=";
+    hash = "sha256-ewaIs7yvVgpRTpXMSGGW/odnDpNOii6u3eSdIY5mw5E=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit pname version src pnpm;
-    hash = "sha256-ONY4hg93admJ3p/ga7KgVR7y/BvAOQUK29LcVu1uw7k=";
+    hash = "sha256-fw45hrcMXV01puca9wdxJXOQu9YTy205UkLCEz7DITA=";
     fetcherVersion = 4;
   };
 
