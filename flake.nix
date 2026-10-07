@@ -14,6 +14,7 @@
         summarize = systems;
         discrawl = systems;
         wacrawl = systems;
+        wacli = systems;
         gogcli = systems;
         goplaces = systems;
         camsnap = systems;
@@ -48,6 +49,9 @@
           // {
             camsnap-runtime = pkgs.callPackage ./nix/checks/camsnap-runtime.nix {
               camsnap = packages.camsnap;
+            };
+            wacli-runtime = pkgs.callPackage ./nix/checks/wacli-runtime.nix {
+              wacli = packages.wacli;
             };
           }
           // (lib.optionalAttrs (packages ? qmd) {

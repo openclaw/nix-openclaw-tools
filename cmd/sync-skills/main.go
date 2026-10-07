@@ -25,6 +25,7 @@ type Mapping struct {
 var skillMappings = []Mapping{
 	{"summarize", "skills/summarize"},
 	{"discrawl", ".agents/skills/discrawl"},
+	{"wacli", "extensions/whatsapp/skills/wacli"},
 	{"gogcli", "skills/gog"},
 	{"goplaces", "skills/goplaces"},
 	{"camsnap", "skills/camsnap"},
