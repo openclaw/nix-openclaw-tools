@@ -4,6 +4,7 @@
 
 **Highlights:** Restore automatic tool updates and refresh the packaged releases.
 
+- Refresh the shared nixpkgs input to the October 7 snapshot across the root flake and all thirteen plugin locks.
 - Package wacli 0.19.0 for Apple Silicon macOS and x86_64/aarch64 Linux, with plugin metadata, automated release and skill updates, and offline SQLite/FTS5 runtime checks (thanks @mavam, #33).
 - Run the full CI matrix after automated tool and skill updates, which GitHub otherwise excludes from push-triggered workflows.
 - Refresh the shared nixpkgs input to the September 28 snapshot across the root flake and all twelve plugin locks.
