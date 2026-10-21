@@ -4,7 +4,7 @@
 
 **Highlights:** Restore automatic tool updates and refresh the packaged releases.
 
-- Run macOS package checks on Xcode 27 and use patched Go 1.27.2 for maintenance automation while retaining Go 1.22 compatibility coverage.
+- Run macOS package checks on Xcode 27 and use patched Go 1.27.3 for maintenance automation while retaining Go 1.22 compatibility coverage.
 - Refresh the shared nixpkgs input to the October 7 snapshot across the root flake and all thirteen plugin locks.
 - Package wacli 0.19.0 for Apple Silicon macOS and x86_64/aarch64 Linux, with plugin metadata, automated release and skill updates, and offline SQLite/FTS5 runtime checks (thanks @mavam, #33).
 - Run the full CI matrix after automated tool and skill updates, which GitHub otherwise excludes from push-triggered workflows.
