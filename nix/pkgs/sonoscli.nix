@@ -3,22 +3,22 @@
 let
   sources = {
     "aarch64-darwin" = {
-      url = "https://github.com/steipete/sonoscli/releases/download/v0.3.4/sonoscli_0.3.4_darwin_arm64.tar.gz";
-      hash = "sha256-03/6r9uioBbIVHfuRRc+YGiyvx9wEVMQUfVknG+DRW4=";
+      url = "https://github.com/steipete/sonoscli/releases/download/v0.3.5/sonoscli_0.3.5_darwin_arm64.tar.gz";
+      hash = "sha256-EcWC7E3O0sTVOZxsxOlr7UI93AToWGOw4dWd5USFgLI=";
     };
     "x86_64-linux" = {
-      url = "https://github.com/steipete/sonoscli/releases/download/v0.3.4/sonoscli_0.3.4_linux_amd64.tar.gz";
-      hash = "sha256-GBxSGSuoxBHagQBqA/OCkeET+xJRF58dlHzjzMhUBDI=";
+      url = "https://github.com/steipete/sonoscli/releases/download/v0.3.5/sonoscli_0.3.5_linux_amd64.tar.gz";
+      hash = "sha256-suum8TS5s48AeHj2e4XNwgSP3O03x4Es6incVzXnxWY=";
     };
     "aarch64-linux" = {
-      url = "https://github.com/steipete/sonoscli/releases/download/v0.3.4/sonoscli_0.3.4_linux_arm64.tar.gz";
-      hash = "sha256-61eLFp2nWpaY5v2euS2qrUN25QYugrhQdcJV9095aa4=";
+      url = "https://github.com/steipete/sonoscli/releases/download/v0.3.5/sonoscli_0.3.5_linux_arm64.tar.gz";
+      hash = "sha256-NsWN5IDwaN28u4DaabQuXURHejx2Ty7SHxaFC45lnvA=";
     };
   };
 in
 stdenv.mkDerivation {
   pname = "sonoscli";
-  version = "0.3.4";
+  version = "0.3.5";
 
   src = fetchurl sources.${stdenv.hostPlatform.system};
 
