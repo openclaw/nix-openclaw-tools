@@ -160,7 +160,7 @@ check pull embedding/reranking models; model prewarming belongs in nix-openclaw.
 
 Automation commits directly when versions or skills change. The two maintenance
 workflows share a concurrency group so their pushes do not overlap. They use Go
-1.27.3; CI also tests Go 1.22.12, preserving the module's Go 1.22 minimum.
+1.27.3; CI uses the same patched toolchain. The module retains its Go 1.22 minimum.
 
 Maintenance pushes use `GITHUB_TOKEN`, which does not trigger push workflows.
 After publishing changes, both workflows explicitly dispatch CI on `main`.
