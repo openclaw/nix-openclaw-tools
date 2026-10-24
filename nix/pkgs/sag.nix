@@ -3,18 +3,18 @@
 let
   sources = {
     "aarch64-darwin" = {
-      url = "https://github.com/steipete/sag/releases/download/v0.4.4/sag_0.4.4_darwin_arm64.tar.gz";
-      hash = "sha256-Q8VsGMvMD8RgXC+N37y1oyPFT9Z1dJ8fqZkgWq+q2fw=";
+      url = "https://github.com/steipete/sag/releases/download/v0.4.5/sag_0.4.5_darwin_arm64.tar.gz";
+      hash = "sha256-WcIv54Gs8pgRj+nq467s/ZW0714li9oaOBvSqu1LE2o=";
     };
     "x86_64-linux" = {
-      url = "https://github.com/steipete/sag/releases/download/v0.4.4/sag_0.4.4_linux_amd64.tar.gz";
-      hash = "sha256-EmVn+pj8uTycqGBpl2oq3WDDqU6SNmFa94RxD81AGsQ=";
+      url = "https://github.com/steipete/sag/releases/download/v0.4.5/sag_0.4.5_linux_amd64.tar.gz";
+      hash = "sha256-GzpyoshLLqVyrN2cxm2lBKTP8xi4omrVLqpHB1Oi14k=";
     };
   };
 in
 stdenv.mkDerivation {
   pname = "sag";
-  version = "0.4.4";
+  version = "0.4.5";
 
   src = fetchurl sources.${stdenv.hostPlatform.system};
 
