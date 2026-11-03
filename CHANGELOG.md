@@ -4,6 +4,7 @@
 
 **Highlights:** Restore automatic tool updates and refresh the packaged releases.
 
+- Run CodeQL weekly and on pull requests or manual dispatch, retaining Actions and Go analysis without duplicate scans on every main push.
 - Fix the macOS runtime check for imsg's resources inside `Contents/Resources` bundles (thanks @SebTardif, #41).
 - Run all maintenance CI jobs with patched Go 1.27.3 while retaining the Go 1.22 module minimum.
 - Run macOS package checks on Xcode 27 and use patched Go 1.27.3 for maintenance automation while retaining Go 1.22 compatibility coverage.
