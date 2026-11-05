@@ -3,22 +3,22 @@
 let
   sources = {
     "aarch64-darwin" = {
-      url = "https://github.com/openclaw/wacrawl/releases/download/v0.4.4/wacrawl_0.4.4_darwin_arm64.tar.gz";
-      hash = "sha256-63UVfJDfaEuCHj/KScMIcfgfjOkflywFv9QaBY8KJxM=";
+      url = "https://github.com/openclaw/wacrawl/releases/download/v0.5.0/wacrawl_0.5.0_darwin_arm64.tar.gz";
+      hash = "sha256-WY0Kt/h4fAwjaPA+VZvjfF7S+4nmPuwA5YxqK1FY/QM=";
     };
     "x86_64-linux" = {
-      url = "https://github.com/openclaw/wacrawl/releases/download/v0.4.4/wacrawl_0.4.4_linux_amd64.tar.gz";
-      hash = "sha256-L6wl67xsXun1Sh30qukWWKATGNleR70mK+V622yLcM0=";
+      url = "https://github.com/openclaw/wacrawl/releases/download/v0.5.0/wacrawl_0.5.0_linux_amd64.tar.gz";
+      hash = "sha256-6NM4hyr8Awq2lEJS+tH8oEvoKznn8gLLS2fjo50Fej8=";
     };
     "aarch64-linux" = {
-      url = "https://github.com/openclaw/wacrawl/releases/download/v0.4.4/wacrawl_0.4.4_linux_arm64.tar.gz";
-      hash = "sha256-QfjsOpGKKb0tKAHSgQAthSRtleYADR/D6Kes50iVaqI=";
+      url = "https://github.com/openclaw/wacrawl/releases/download/v0.5.0/wacrawl_0.5.0_linux_arm64.tar.gz";
+      hash = "sha256-oXga1WEGdFubryHbSkLwzAWVFrgJc2RofjTkAvTAVs8=";
     };
   };
 in
 stdenv.mkDerivation {
   pname = "wacrawl";
-  version = "0.4.4";
+  version = "0.5.0";
 
   src = fetchurl sources.${stdenv.hostPlatform.system};
 
