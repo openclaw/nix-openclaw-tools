@@ -3,20 +3,20 @@
 let
   sources = {
     "aarch64-darwin" = {
-      url = "https://github.com/openclaw/goplaces/releases/download/v0.4.14/goplaces_0.4.14_darwin_arm64.tar.gz";
-      hash = "sha256-cyZpbdwjv3lW7xoojf2M/P2TtVlBFzTWRS7m9AKRUE0=";
+      url = "https://github.com/openclaw/goplaces/releases/download/v0.5.0/goplaces_0.5.0_darwin_arm64.tar.gz";
+      hash = "sha256-nDm31i2PxTptF4o56fxT02hPBDJpljCLaLObqHQipOc=";
     };
     "x86_64-darwin" = {
-      url = "https://github.com/openclaw/goplaces/releases/download/v0.4.14/goplaces_0.4.14_darwin_amd64.tar.gz";
-      hash = "sha256-OY7pYv0ef4Nd5jWumbJjB95v121LPzjY1f8ltqAArXc=";
+      url = "https://github.com/openclaw/goplaces/releases/download/v0.5.0/goplaces_0.5.0_darwin_amd64.tar.gz";
+      hash = "sha256-lwNMU4g+wCLexT7/HmlABzsoT80mJNswu0IJ6W8TWu8=";
     };
     "x86_64-linux" = {
-      url = "https://github.com/openclaw/goplaces/releases/download/v0.4.14/goplaces_0.4.14_linux_amd64.tar.gz";
-      hash = "sha256-40Iw2W6YiPjPv0PQ2BZBX2y4L0PDYifRK67H2ZJ5a38=";
+      url = "https://github.com/openclaw/goplaces/releases/download/v0.5.0/goplaces_0.5.0_linux_amd64.tar.gz";
+      hash = "sha256-Qt02ACHAwnPxgPrbvzaQquA2x2uHs0F4WC0HGWhjwqI=";
     };
     "aarch64-linux" = {
-      url = "https://github.com/openclaw/goplaces/releases/download/v0.4.14/goplaces_0.4.14_linux_arm64.tar.gz";
-      hash = "sha256-o3fp32dJUXfhNYCQ8K0nebBgQHHRZi9pQ/1SS1WgiZU=";
+      url = "https://github.com/openclaw/goplaces/releases/download/v0.5.0/goplaces_0.5.0_linux_arm64.tar.gz";
+      hash = "sha256-Ey5R5c1iQb/VGVZ+Hcs3bf+z3oMoinNolKSPoZh6TWo=";
     };
   };
 
@@ -31,7 +31,7 @@ let
 in
 stdenv.mkDerivation {
   pname = "goplaces";
-  version = "0.4.14";
+  version = "0.5.0";
 
   src = fetchurl sources.${stdenv.hostPlatform.system};
 
