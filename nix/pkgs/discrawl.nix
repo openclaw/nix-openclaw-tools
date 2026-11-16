@@ -3,22 +3,22 @@
 let
   sources = {
     "aarch64-darwin" = {
-      url = "https://github.com/openclaw/discrawl/releases/download/v0.20.0/discrawl_0.20.0_darwin_arm64.tar.gz";
-      hash = "sha256-OqncPR74mmkxvULQRGVdwMVuFMH921L9iH8pqZ/1TfI=";
+      url = "https://github.com/openclaw/discrawl/releases/download/v0.21.0/discrawl_0.21.0_darwin_arm64.tar.gz";
+      hash = "sha256-jwHlBe4MOwEZx0Cz1OGXJayiHvgiKh+em1LMPUpK9wI=";
     };
     "x86_64-linux" = {
-      url = "https://github.com/openclaw/discrawl/releases/download/v0.20.0/discrawl_0.20.0_linux_amd64.tar.gz";
-      hash = "sha256-XaXbmNam9D4v/DGXE9jzxImZGM0VdWA3n8FpO5tX+Lc=";
+      url = "https://github.com/openclaw/discrawl/releases/download/v0.21.0/discrawl_0.21.0_linux_amd64.tar.gz";
+      hash = "sha256-DsmESMggUZ4SMNCm6nA5oStLt4GEjYtvbkaeQSZieQI=";
     };
     "aarch64-linux" = {
-      url = "https://github.com/openclaw/discrawl/releases/download/v0.20.0/discrawl_0.20.0_linux_arm64.tar.gz";
-      hash = "sha256-wJ8LMIjwRBOuwquhviaxssbYQo3ZoFVxKeQpLWpa1ek=";
+      url = "https://github.com/openclaw/discrawl/releases/download/v0.21.0/discrawl_0.21.0_linux_arm64.tar.gz";
+      hash = "sha256-eNcLQ3d49fj2Er+BzCxCf7qzgdubgKYxPoX0PlRZUhI=";
     };
   };
 in
 stdenv.mkDerivation {
   pname = "discrawl";
-  version = "0.20.0";
+  version = "0.21.0";
 
   src = fetchurl sources.${stdenv.hostPlatform.system};
 

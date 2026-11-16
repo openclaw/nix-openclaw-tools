@@ -3,14 +3,14 @@
 let
   sources = {
     "aarch64-darwin" = {
-      url = "https://github.com/openclaw/imsg/releases/download/v0.21.0/imsg-macos.zip";
-      hash = "sha256-DaZKHCwSXroDPECS6hemmX8czFHb2L5ozneqQ99tiIU=";
+      url = "https://github.com/openclaw/imsg/releases/download/v0.21.1/imsg-macos.zip";
+      hash = "sha256-ePzZt3cMqerXEiis8YZ1knkRUHiJXR7hKZoJMzgkx38=";
     };
   };
 in
 stdenv.mkDerivation {
   pname = "imsg";
-  version = "0.21.0";
+  version = "0.21.1";
 
   src = fetchurl sources.${stdenv.hostPlatform.system};
 
