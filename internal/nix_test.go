@@ -8,10 +8,44 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
 )
+
+func TestPrefetchGitHubUsesNativeArchivePrefetch(t *testing.T) {
+	dir := t.TempDir()
+	script := `#!/bin/sh
+if [ "$*" != "store prefetch-file --json --unpack https://github.com/tobi/qmd/archive/v2.9.0.tar.gz" ]; then
+  echo "unexpected prefetch command: $*" >&2
+  exit 1
+fi
+echo 'download progress {not JSON}' >&2
+echo '{"hash":"sha256-source"}'
+`
+	if err := os.WriteFile(filepath.Join(dir, "nix"), []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("PATH", dir+string(os.PathListSeparator)+os.Getenv("PATH"))
+	hash, err := PrefetchGitHub("tobi", "qmd", "v2.9.0")
+	if err != nil || hash != "sha256-source" {
+		t.Fatalf("PrefetchGitHub = %q, %v", hash, err)
+	}
+}
+
+func TestPrefetchGitHubReportsNixFailure(t *testing.T) {
+	dir := t.TempDir()
+	script := "#!/bin/sh\necho 'download response'\necho 'archive unavailable' >&2\nexit 1\n"
+	if err := os.WriteFile(filepath.Join(dir, "nix"), []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("PATH", dir+string(os.PathListSeparator)+os.Getenv("PATH"))
+	_, err := PrefetchGitHub("tobi", "qmd", "v2.9.0")
+	if err == nil || !strings.Contains(err.Error(), "download response") || !strings.Contains(err.Error(), "archive unavailable") {
+		t.Fatalf("missing prefetch diagnostics: %v", err)
+	}
+}
 
 func installHangCommand(t *testing.T, name string) string {
 	t.Helper()

@@ -4,6 +4,8 @@
 
 **Highlights:** Restore automatic tool updates and refresh the packaged releases.
 
+- Restore QMD updates with Nix's built-in archive prefetch, avoiding the failing `nix-prefetch-github` helper.
+- Use Go 1.27.4 in CI, CodeQL, and maintenance automation to address GO-2026-6859 while retaining the Go 1.22 module minimum.
 - Run CodeQL weekly and on pull requests or manual dispatch, retaining Actions and Go analysis without duplicate scans on every main push.
 - Fix the macOS runtime check for imsg's resources inside `Contents/Resources` bundles (thanks @SebTardif, #41).
 - Run all maintenance CI jobs with patched Go 1.27.3 while retaining the Go 1.22 module minimum.
