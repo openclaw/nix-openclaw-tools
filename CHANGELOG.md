@@ -4,6 +4,7 @@
 
 **Highlights:** Restore automatic tool updates and refresh the packaged releases.
 
+- Publish automated tool and skill updates through pull requests, requiring exact-head CI before squash merge and retaining CI after publication.
 - Check out current main when queued maintenance jobs start, avoiding stale updates and rejected pushes after an earlier job publishes changes.
 - Restore QMD updates with Nix's built-in archive prefetch, avoiding the failing `nix-prefetch-github` helper.
 - Use Go 1.27.4 in CI, CodeQL, and maintenance automation to address GO-2026-6859 while retaining the Go 1.22 module minimum.
