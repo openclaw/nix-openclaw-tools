@@ -162,7 +162,9 @@ check pull embedding/reranking models; model prewarming belongs in nix-openclaw.
 | **Garnix** | On push | Builds all packages via `checks.*` (darwin + linux) |
 
 Automation commits directly when versions or skills change. The two maintenance
-workflows share a concurrency group so their pushes do not overlap. They use Go
+workflows share a concurrency group so their pushes do not overlap, and each
+checks out current `main` when it starts so queued runs include preceding updates.
+They use Go
 1.27.4; CI and CodeQL use the same patched toolchain. The module retains its Go 1.22 minimum.
 
 Maintenance pushes use `GITHUB_TOKEN`, which does not trigger push workflows.
