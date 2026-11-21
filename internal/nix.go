@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
@@ -18,9 +19,18 @@ type PrefetchResult struct {
 }
 
 func PrefetchHash(url string) (string, error) {
+	return prefetchHash(url, false)
+}
+
+func prefetchHash(url string, unpack bool) (string, error) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	if err := RunCommand("", PrefetchTimeout, &stdout, &stderr, "nix", "store", "prefetch-file", "--json", url); err != nil {
+	args := []string{"store", "prefetch-file", "--json"}
+	if unpack {
+		args = append(args, "--unpack")
+	}
+	args = append(args, url)
+	if err := RunCommand("", PrefetchTimeout, &stdout, &stderr, "nix", args...); err != nil {
 		return "", fmt.Errorf("prefetch failed: %w\nstdout:\n%s\nstderr:\n%s", err, stdout.String(), stderr.String())
 	}
 	var res PrefetchResult
@@ -34,25 +44,8 @@ func PrefetchHash(url string) (string, error) {
 }
 
 func PrefetchGitHub(owner, repo, rev string) (string, error) {
-	var out bytes.Buffer
-	if err := RunCommand("", PrefetchTimeout, &out, &out, "nix", "run", "--inputs-from", ".", "nixpkgs#nix-prefetch-github", "--", "--json", "--quiet", owner, repo, "--rev", rev); err != nil {
-		return "", fmt.Errorf("prefetch github failed: %w: %s", err, out.String())
-	}
-	raw := out.String()
-	start := strings.Index(raw, "{")
-	end := strings.LastIndex(raw, "}")
-	if start == -1 || end == -1 || end <= start {
-		return "", fmt.Errorf("prefetch github returned non-json: %s", raw)
-	}
-	payload := raw[start : end+1]
-	var res PrefetchResult
-	if err := json.Unmarshal([]byte(payload), &res); err != nil {
-		return "", err
-	}
-	if res.Hash == "" {
-		return "", fmt.Errorf("empty hash for %s/%s@%s", owner, repo, rev)
-	}
-	return res.Hash, nil
+	archive := fmt.Sprintf("https://github.com/%s/%s/archive/%s.tar.gz", url.PathEscape(owner), url.PathEscape(repo), url.PathEscape(rev))
+	return prefetchHash(archive, true)
 }
 
 func NixBuildSummarize() (string, error) {

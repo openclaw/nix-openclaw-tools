@@ -132,6 +132,9 @@ Fetches latest release versions/URLs/hashes and updates the Nix expressions.
 Asset patterns match complete filenames, excluding checksum/signature sidecars
 and prefixed variants of the expected archives.
 
+QMD source hashes use Nix's built-in archive prefetch, with the same unpacked
+source hash as `fetchFromGitHub`. No separate `nix-prefetch-github` helper is needed.
+
 Peekaboo currently uses 4.5.0 to preserve macOS 15 support. Its 4.6.0 release
 binary imports `swift_initBorrow` from a newer system Swift runtime and fails
 before startup on macOS 15. The updater skips that exact release with a logged
@@ -160,7 +163,7 @@ check pull embedding/reranking models; model prewarming belongs in nix-openclaw.
 
 Automation commits directly when versions or skills change. The two maintenance
 workflows share a concurrency group so their pushes do not overlap. They use Go
-1.27.3; CI uses the same patched toolchain. The module retains its Go 1.22 minimum.
+1.27.4; CI and CodeQL use the same patched toolchain. The module retains its Go 1.22 minimum.
 
 Maintenance pushes use `GITHUB_TOKEN`, which does not trigger push workflows.
 After publishing changes, both workflows explicitly dispatch CI on `main`.
