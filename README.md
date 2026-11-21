@@ -161,15 +161,19 @@ check pull embedding/reranking models; model prewarming belongs in nix-openclaw.
 | **update-tools** | Every 10 min | Checks for new tool releases |
 | **Garnix** | On push | Builds all packages via `checks.*` (darwin + linux) |
 
-Automation commits directly when versions or skills change. The two maintenance
-workflows share a concurrency group so their pushes do not overlap, and each
-checks out current `main` when it starts so queued runs include preceding updates.
+Automation opens or updates a dedicated pull request when versions or skills
+change. The two maintenance workflows share a concurrency group and each checks
+out current `main` when it starts so queued runs include preceding updates.
 They use Go
 1.27.4; CI and CodeQL use the same patched toolchain. The module retains its Go 1.22 minimum.
 
-Maintenance pushes use `GITHUB_TOKEN`, which does not trigger push workflows.
-After publishing changes, both workflows explicitly dispatch CI on `main`.
-Unchanged runs skip dispatch; a failed push or dispatch fails the maintenance run.
+Maintenance uses `GITHUB_TOKEN`, so both workflows explicitly dispatch CI on the
+pull request branch and require success on that exact head before a normal squash
+merge. A changed `main`, failed CI, or a 20-minute CI timeout leaves the pull request
+unmerged and fails publication. After verifying the merged files, both workflows
+dispatch CI on `main` and record the matching run. Unchanged runs skip dispatch.
+Successful individual tool updates can still publish when another tool fails;
+the maintenance run continues to report that generator failure.
 
 All plugin flakes follow the root nixpkgs input. After updating the root lock,
 refresh the plugin locks with `nix flake update --flake ./tools/<tool>` for each
