@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   actions: write
+  pull-requests: write
 
 concurrency:
   group: maintenance-main
@@ -16,13 +17,18 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 115
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # Queued runs must include updates published by the preceding run.
           ref: main
+          persist-credentials: false
+
+      - name: Record source base
+        id: source
+        run: echo "base=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Install Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
@@ -39,9 +45,36 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: go run ./cmd/update-tools
 
-      - name: Commit & push if changed
+      - name: Check source base before publishing
         if: ${{ !cancelled() && (success() || steps.update.outcome == 'failure') }}
+        id: admission
         env:
           GH_TOKEN: ${{ github.token }}
+          SOURCE_BASE: ${{ steps.source.outputs.base }}
+        run: bash scripts/publish-updates.sh prepare "$SOURCE_BASE"
+
+      - name: Stage update pull request
+        if: ${{ !cancelled() && steps.admission.outcome == 'success' }}
+        id: pr
+        uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8.0.0
+        with:
+          token: ${{ github.token }}
+          branch-token: ${{ github.token }}
+          path: .
+          base: main
+          branch: automation/update-tools
+          add-paths: nix/pkgs/*.nix
+          commit-message: "chore: update tool releases"
+          title: "chore: update tool releases"
+          body: "Updates reproducible tool packages from upstream releases. Publication waits for CI on this exact head."
+          draft: false
+
+      - name: Validate and merge update pull request
+        if: ${{ !cancelled() && steps.pr.outcome == 'success' && steps.pr.outputs.pull-request-number != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.pull-request-number }}
+          PR_HEAD: ${{ steps.pr.outputs.pull-request-head-sha }}
+          SOURCE_BASE: ${{ steps.source.outputs.base }}
         run: |
-          bash scripts/publish-updates.sh "chore: update tool releases"
+          bash scripts/publish-updates.sh "$PR_NUMBER" "$PR_HEAD" "$SOURCE_BASE" automation/update-tools ':(glob)nix/pkgs/*.nix'
